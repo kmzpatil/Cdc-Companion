@@ -3,7 +3,6 @@
 import { FormEvent, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { BACKEND_URL } from '@/constants/apiConstants'
 
 const PROFILES = [
@@ -16,7 +15,6 @@ const PROFILES = [
 ]
 
 export default function ReviewerSignupPage() {
-  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     rollNo: '',
@@ -30,7 +28,7 @@ export default function ReviewerSignupPage() {
   const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
