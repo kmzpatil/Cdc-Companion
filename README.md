@@ -9,10 +9,10 @@
 
 ```mermaid
 flowchart TB
-    subgraph Frontend[Frontend (Next.js)]
+    subgraph FrontendLayer[Frontend - Next.js]
         FE[React UI] -->|fetches| API[Backend API]
     end
-    subgraph Backend[Backend (Express + Prisma)]
+    subgraph BackendLayer[Backend - Express + Prisma]
         API --> DB[(PostgreSQL)]
         API --> Auth[JWT Auth]
         API --> Rate[Rate Limiter]
