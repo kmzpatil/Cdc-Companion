@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CDC Companion Frontend
 
-## Getting Started
+A premium, interactive web portal built with **Next.js, React, TailwindCSS, and TypeScript** designed for candidates, reviewers, and administrators to seamlessly manage the CV Review Drive.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🌟 Portals & Pages
+
+### 1. Candidate CV Submission Portal (`/`)
+* Students can register their CVs by providing their name, institute email, roll number, and Google Drive links.
+* Features integrated client-side validation for:
+  * Institute email formats (`@kgpian.iitkgp.ac.in`).
+  * Roll Number prefixes (validated against target year formats).
+  * Valid Google Drive URL patterns.
+
+### 2. Isolated Reviewer Registration (`/signup`)
+* A hidden standalone registration portal constructed to match the historical Google Form registrations.
+* Reviewers can sign up, select multiple target profiles they are willing to review, specify their quota, and input queries.
+* **Seniority Mapping:** Automatically maps the reviewer's roll number to their login password to automatically satisfy backend seniority match filters (`pwdPrefix <= rollPrefix`).
+
+### 3. Reviewer Portal (`/reviewer`)
+* Login via `/login` with full name and roll number.
+* Interactive, custom-styled dashboard displaying candidate queues, allocated reviewees, and candidate status tracking.
+* Sleek review editor allowing reviewers to evaluate and comment on:
+  * Structure & Format
+  * Relevance to Domain
+  * Depth of Explanation
+  * Language & Grammar
+  * Improvements in Projects
+  * Additional Suggestions
+
+### 4. Admin Dashboard (`/admin`)
+* Access secured via `/login/admin`.
+* Features complete pipeline visibility across three bento-style grids:
+  * **Reviewees:** List candidates, track progress, and perform clean removals.
+  * **Reviewers:** View active reviewers, their profiles, quotas, and current assignments.
+  * **Reviews:** View completed evaluations and domain comments.
+* **Auto-Allocation Controller:** Trigger the matching logic from the header in one click.
+* **Relational Row Removals:** Full administrator power to delete candidates, reviewers, or specific reviews inline with automatic state updates.
+
+---
+
+## 🛠️ Setup & Installation
+
+### 1. Prerequisites
+* **Node.js** (v18+)
+* **npm** (v9+)
+
+### 2. Environment Setup
+Create a `.env` file in the root directory:
+```env
+# URL of your running backend service
+BACKEND_URL="http://localhost:5000"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Install & Start
+```bash
+# Install dependencies
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Start development server
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Build for production
+npm run build
+npm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Security Integration
+* **Resilient `authFetch` Context:** Custom authentication wrapper automatically bridges context state with local storage tokens.
+* **Security Middleware Guards:** All requests are globally guarded in backend routers via JWT claims, keeping the dashboard strictly administrator-only.
