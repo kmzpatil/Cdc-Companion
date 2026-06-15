@@ -43,7 +43,7 @@ export default function ReviewerLoginPage() {
       <header className="animate-slide-down w-full flex flex-col sm:flex-row items-center justify-between py-4 sm:py-6 px-4 mb-6 sm:mb-8 gap-3 sm:gap-0 bg-transparent text-center sm:text-left">
         <div className="flex items-center gap-3 w-full justify-center sm:justify-start">
           <Image
-            src="/White logo.png"
+            src="/CQ LOGO white.png"
             alt="Communiqué Logo"
             width={240}
             height={75}
