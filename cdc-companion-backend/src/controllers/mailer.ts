@@ -279,27 +279,12 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
       
       <div class="divider"></div>
       
-      <!-- Call to Action -->
-      <div class="cta-section">
-        <div class="cta-text">
-          Ready to take your career to the next level?
-        </div>
-        <a href="https://prepnest.in/?refercode=PrepGrow-sahib-singhprepgrowthpartner-02" class="cta-button">
-          Explore PrepNest Services
-        </a>
-      </div>
-      
-      <!-- Logo Section -->
-      <div class="logo-section">
-        <img src="cid:prepnestImage" alt="PrepNest Logo" class="logo-section-img">
-      </div>
     </div>
     
     <!-- Footer -->
     <div class="footer">
-      <div class="footer-brand">PrepNest</div>
-      <div class="footer-tagline">Simplifying your job journey</div>
-      <a href="https://www.prepnest.in" class="footer-website">www.prepnest.in</a>
+      <div class="footer-brand">Communiqué</div>
+      <div class="footer-tagline">IIT Kharagpur Placement & Internship Preparation Companion</div>
     </div>
   </div>
 </body>
@@ -308,7 +293,7 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
 }
 
 /**
- * Send a CV review email with embedded PrepNest image.
+ * Send a CV review email.
  */
 export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void> {
   const html = buildReviewEmail(options)
@@ -318,13 +303,6 @@ export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void
     to: options.to,
     subject: '🎉 Your CV Review is Ready!',
     html,
-    attachments: [
-      {
-        filename: 'prepnest.jpg',
-        path: path.resolve(__dirname, '../../assets/prepnest.jpg'),
-        cid: 'prepnestImage',
-      },
-    ],
   })
 }
 
@@ -338,7 +316,7 @@ export async function sendRegistrationEmail(to: string, userName: string, passwo
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Submission Confirmed - PrepNest</title>
+    <title>CV Submission Confirmed - CDC Companion</title>
     <style>
       body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -423,7 +401,7 @@ export async function sendRegistrationEmail(to: string, userName: string, passwo
       </p>
 
       <div class="footer">
-        <p>PrepNest • Simplifying your job journey</p>
+        <p>Communiqué • IIT Kharagpur Placement & Internship Preparation Companion</p>
       </div>
     </div>
   </body>

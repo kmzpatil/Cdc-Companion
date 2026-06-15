@@ -213,5 +213,48 @@ class AdminController {
             }
         });
     }
+    // POST /api/admin/reassign
+    reassign(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { revieweeId, reviewerId } = req.body;
+                const rId = reviewerId ? parseInt(reviewerId, 10) : null;
+                const cvId = parseInt(revieweeId, 10);
+                const cv = yield prisma_1.default.reviewee.findUnique({
+                    where: { id: cvId },
+                });
+                if (!cv) {
+                    return res.status(404).json({ error: 'CV/Reviewee not found' });
+                }
+                const oldReviewerId = cv.assignedToId;
+                // Update the assignment
+                yield prisma_1.default.reviewee.update({
+                    where: { id: cvId },
+                    data: { assignedToId: rId },
+                });
+                // Adjust counts for old reviewer
+                if (oldReviewerId && oldReviewerId !== rId) {
+                    const oldReviewer = yield prisma_1.default.reviewer.findUnique({ where: { id: oldReviewerId } });
+                    if (oldReviewer && oldReviewer.reviewedCount > 0) {
+                        yield prisma_1.default.reviewer.update({
+                            where: { id: oldReviewerId },
+                            data: { reviewedCount: { decrement: 1 } },
+                        });
+                    }
+                }
+                // Adjust counts for new reviewer
+                if (rId && oldReviewerId !== rId) {
+                    yield prisma_1.default.reviewer.update({
+                        where: { id: rId },
+                        data: { reviewedCount: { increment: 1 } },
+                    });
+                }
+                return res.json({ message: 'Assignment updated successfully' });
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+    }
 }
 exports.default = AdminController;

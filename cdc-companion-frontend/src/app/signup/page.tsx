@@ -121,167 +121,178 @@ export default function ReviewerSignupPage() {
   }
 
   return (
-    <section className="animate-fade-in mx-auto grid min-h-screen w-full max-w-6xl grid-cols-1 gap-8 px-4 py-8 md:grid-cols-5 md:px-8 md:py-12">
-      <aside className="paper-card animate-slide-up md:col-span-2 p-6 md:p-8 flex flex-col justify-between">
-        <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">CV Review Drive</p>
-          <h1 className="mb-3 text-3xl font-black leading-tight text-[#1b2126]">
-            CV Review 2026 | Communiqué
-          </h1>
-          <p className="text-sm text-[#4f5964] mb-6">
-            As CDC season approaches, we are organizing events to guide students, and your expertise would greatly benefit them. We would be delighted if you could participate as a CV Reviewer in the CV Review Drive and review 3-5 student CVs to help refine their applications.
-          </p>
-          <p className="text-xs text-[#4f5964] italic">
-            *Tentative date for CV Review is 16th June onwards.
-          </p>
-        </div>
-        <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface-strong">
+    <section className="animate-fade-in mx-auto w-full max-w-[95%] px-4 py-8 md:px-8 md:py-10">
+      <header className="animate-slide-down w-full flex flex-col sm:flex-row items-center justify-between py-4 sm:py-6 px-4 mb-6 sm:mb-8 gap-3 sm:gap-0 bg-transparent text-center sm:text-left">
+        <div className="flex items-center gap-3 w-full justify-center sm:justify-start">
           <Image
-            src="/banner.png"
-            alt="CDC Companion Banner"
-            width={1200}
-            height={460}
-            priority
-            className="h-auto w-full"
+            src="/White logo.png"
+            alt="Communiqué Logo"
+            width={240}
+            height={75}
+            className="w-[80%] sm:w-auto h-auto max-w-[240px] object-contain"
           />
         </div>
-      </aside>
-
-      <div className="paper-card animate-slide-down md:col-span-3 p-6 md:p-10">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-[#1b2126]">Reviewer Registration</h2>
-          <p className="mt-1 text-sm text-[#4f5964]">Kindly fill in the details below to participate as a CV Reviewer.</p>
+        <div>
+          <span className="text-lg sm:text-2xl font-black tracking-widest text-white font-mono uppercase bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+            CDC Companion
+          </span>
         </div>
+      </header>
 
-        <p aria-live="polite" className={error ? 'status-note mb-5 text-sm' : 'sr-only'}>
-          {error || 'No errors'}
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-7">
+        <aside className="animate-slide-up lg:col-span-2 p-0 lg:p-8 flex flex-col justify-between lg:h-full h-fit border-0 lg:border-l-4 border-l-accent transition-all duration-500 hover:border-l-indigo-400 lg:paper-card bg-transparent shadow-none lg:shadow-[0_0_40px_-10px_rgba(59,130,246,0.2)] lg:hover:shadow-[0_0_55px_-5px_rgba(139,92,246,0.4)]">
           <div>
-            <label htmlFor="name" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              Full Name *
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              required
-              className="field"
-              placeholder="Enter your full name"
-            />
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">CV Review Drive</p>
+            <h1 className="mb-3 text-2xl lg:text-3xl font-black leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 tracking-tight">
+              CV Review 2026 | Communiqué
+            </h1>
+            <p className="text-sm text-[#4f5964] mb-6">
+              As CDC season approaches, we are organizing events to guide students, and your expertise would greatly benefit them. We would be delighted if you could participate as a CV Reviewer in the CV Review Drive and review 3-5 student CVs to help refine their applications.
+            </p>
+            <p className="text-xs text-[#4f5964] italic">
+              *Tentative date for CV Review is 16th June onwards.
+            </p>
+          </div>
+        </aside>
+
+        <div className="paper-card animate-slide-down lg:col-span-5 p-6 md:p-10 text-[90%]">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-[#1b2126]">Reviewer Registration</h2>
+            <p className="mt-1 text-sm text-[#4f5964]">Kindly fill in the details below to participate as a CV Reviewer.</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <p aria-live="polite" className={error ? 'status-note mb-5 text-sm' : 'sr-only'}>
+            {error || 'No errors'}
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
-              <label htmlFor="rollNo" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-                Roll Number *
+              <label htmlFor="name" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                Full Name *
               </label>
               <input
-                id="rollNo"
-                name="rollNo"
+                id="name"
+                name="name"
                 type="text"
-                value={formData.rollNo}
-                onChange={(e) => handleInputChange('rollNo', e.target.value)}
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 required
                 className="field"
-                placeholder="Example: 21CS10001"
+                placeholder="Enter your full name"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
+                <label htmlFor="rollNo" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                  Roll Number *
+                </label>
+                <input
+                  id="rollNo"
+                  name="rollNo"
+                  type="text"
+                  value={formData.rollNo}
+                  onChange={(e) => handleInputChange('rollNo', e.target.value)}
+                  required
+                  className="field"
+                  placeholder="Example: 21CS10001"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                  Email Address *
+                </label>
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    required
+                    className="field"
+                    placeholder="example@gmail.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="contactNumber" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                Contact Number *
+              </label>
+              <input
+                id="contactNumber"
+                name="contactNumber"
+                type="tel"
+                value={formData.contactNumber}
+                onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                required
+                className="field"
+                placeholder="Enter your mobile number"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-                Email Address *
+              <label className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                Please select the profile(s) you would like to review CVs for: *
+              </label>
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-border bg-surface-strong">
+                {PROFILES.map((profile) => {
+                  const isChecked = formData.selectedProfiles.includes(profile.value)
+                  return (
+                    <label key={profile.value} className="flex items-center gap-3 cursor-pointer py-1.5">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleProfileChange(profile.value)}
+                        className="h-4 w-4 cursor-pointer rounded border-border text-accent focus:ring-accent"
+                      />
+                      <span className="text-sm font-medium text-[#4f5964]">{profile.key}</span>
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="reviewsNumber" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                How many CVs will you be willing to review?
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                id="reviewsNumber"
+                name="reviewsNumber"
+                type="number"
+                min={1}
+                max={20}
+                value={formData.reviewsNumber}
+                onChange={(e) => handleInputChange('reviewsNumber', Number(e.target.value))}
                 required
                 className="field"
-                placeholder="example@gmail.com"
               />
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="contactNumber" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              Contact Number *
-            </label>
-            <input
-              id="contactNumber"
-              name="contactNumber"
-              type="tel"
-              value={formData.contactNumber}
-              onChange={(e) => handleInputChange('contactNumber', e.target.value)}
-              required
-              className="field"
-              placeholder="Enter your mobile number"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              Please select the profile(s) you would like to review CVs for: *
-            </label>
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-border bg-surface-strong">
-              {PROFILES.map((profile) => {
-                const isChecked = formData.selectedProfiles.includes(profile.value)
-                return (
-                  <label key={profile.value} className="flex items-center gap-3 cursor-pointer py-1.5">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleProfileChange(profile.value)}
-                      className="h-4 w-4 cursor-pointer rounded border-border text-accent focus:ring-accent"
-                    />
-                    <span className="text-sm font-medium text-[#4f5964]">{profile.key}</span>
-                  </label>
-                )
-              })}
+            <div>
+              <label htmlFor="queries" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                Any queries for us? (Optional)
+              </label>
+              <textarea
+                id="queries"
+                name="queries"
+                rows={3}
+                value={formData.queries}
+                onChange={(e) => handleInputChange('queries', e.target.value)}
+                className="field resize-none py-2"
+                placeholder="Write any questions or comments here..."
+              />
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="reviewsNumber" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              How many CVs will you be willing to review?
-            </label>
-            <input
-              id="reviewsNumber"
-              name="reviewsNumber"
-              type="number"
-              min={1}
-              max={20}
-              value={formData.reviewsNumber}
-              onChange={(e) => handleInputChange('reviewsNumber', Number(e.target.value))}
-              required
-              className="field"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="queries" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              Any queries for us? (Optional)
-            </label>
-            <textarea
-              id="queries"
-              name="queries"
-              rows={3}
-              value={formData.queries}
-              onChange={(e) => handleInputChange('queries', e.target.value)}
-              className="field resize-none py-2"
-              placeholder="Write any questions or comments here..."
-            />
-          </div>
-
-          <button type="submit" className="pill-btn pill-btn-primary w-full" disabled={isLoading}>
-            {isLoading ? 'Registering...' : 'Register as CV Reviewer'}
-          </button>
-        </form>
+            <button type="submit" className="pill-btn pill-btn-primary w-full" disabled={isLoading}>
+              {isLoading ? 'Registering...' : 'Register as CV Reviewer'}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   )

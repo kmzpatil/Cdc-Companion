@@ -29,13 +29,17 @@
 
   .aurora-bg {
     background:
-      radial-gradient(55rem 35rem at 92% -8%, rgba(59, 130, 246, 0.15), transparent 70%),
-      radial-gradient(45rem 30rem at -8% 95%, rgba(239, 68, 68, 0.05), transparent 70%),
-      linear-gradient(180deg, #0b0f19 0%, #0f172a 55%, #0b0f19 100%) !important;
+      radial-gradient(70rem 50rem at 90% 5%, rgba(59, 130, 246, 0.22), transparent 75%),
+      radial-gradient(60rem 45rem at 10% 95%, rgba(139, 92, 246, 0.15), transparent 75%),
+      radial-gradient(45rem 35rem at 50% 50%, rgba(236, 72, 153, 0.08), transparent 70%),
+      linear-gradient(180deg, #030508 0%, #080c16 50%, #030508 100%) !important;
   }
 
   .paper-card {
-    background: linear-gradient(155deg, rgba(17, 24, 39, 0.85) 0%, rgba(31, 41, 55, 0.9) 100%) !important;
+    background: rgba(17, 24, 39, 0.45) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
   }
 
@@ -134,8 +138,8 @@
   --color-accent-contrast: var(--accent-contrast);
   --color-danger: var(--danger);
   --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-mono: var(--font-mono), monospace;
 }
 
 * {
@@ -226,9 +230,10 @@ button {
 
 .aurora-bg {
   background:
-    radial-gradient(55rem 35rem at 92% -8%, rgba(37, 99, 235, 0.08), transparent 70%),
-    radial-gradient(45rem 30rem at -8% 95%, rgba(239, 68, 68, 0.03), transparent 70%),
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #e2e8f0 100%);
+    radial-gradient(70rem 50rem at 85% -5%, rgba(59, 130, 246, 0.18), transparent 75%),
+    radial-gradient(60rem 45rem at 15% 85%, rgba(139, 92, 246, 0.12), transparent 75%),
+    radial-gradient(50rem 40rem at 50% 40%, rgba(236, 72, 153, 0.08), transparent 75%),
+    linear-gradient(180deg, #fdfeff 0%, #f8fafc 50%, #f1f5f9 100%);
   background-attachment: fixed;
   position: relative;
 }

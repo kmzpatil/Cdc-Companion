@@ -30,7 +30,7 @@ router.delete('/reviewee/:id', (req, res, next) => {
 router.delete('/reviewer/:id', (req, res, next) => {
     ctrl.deleteReviewer(req, res, next).catch(next);
 });
-router.delete('/review/:id', (req, res, next) => {
-    ctrl.deleteReview(req, res, next).catch(next);
+router.post('/reassign', (req, res, next) => {
+    ctrl.reassign(req, res, next).catch(next);
 });
 exports.default = router;

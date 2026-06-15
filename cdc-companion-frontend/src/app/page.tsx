@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { BACKEND_URL } from '@/constants/apiConstants'
 
 const PROFILES = [
+  { key: 'Select Target Profile', value: '' },
   { key: 'Core', value: 'Core' },
   { key: 'Consult', value: 'Consult' },
   { key: 'Data', value: 'Data' },
@@ -49,16 +50,17 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const validateForm = () => {
-    const { fullName, email, rollNo, password, cvLink, hasGrantedAccess } = formData
+    const { fullName, email, rollNo, password, cvLink, profile, hasGrantedAccess } = formData
 
-    if (!fullName || !email || !rollNo || !password || !cvLink) {
-      setError('Please fill all required fields.')
+    if (!fullName || !email || !rollNo || !password || !cvLink || !profile) {
+      setError('Please fill all required fields and select a target profile.')
       return false
     }
 
@@ -136,23 +138,24 @@ export default function RegisterPage() {
           <p className="mx-auto mb-6 max-w-xl text-sm text-[#4f5964]">
             Thank you for submitting your CV. You will get notified once your review is complete.
           </p>
-          <a
-            href="https://prepnest.in/?refercode=PrepGrow-sahib-singhprepgrowthpartner-02"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pill-btn pill-btn-primary"
-          >
-            Explore PrepNest
-          </a>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface-strong">
-            <Image
-              src="/prepnest.jpg"
-              alt="PrepNest Preview"
-              width={1120}
-              height={760}
-              loading="lazy"
-              className="h-auto w-full"
-            />
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={() => {
+                setShowConfirmation(false)
+                setFormData({
+                  fullName: '',
+                  email: '',
+                  rollNo: '',
+                  password: '',
+                  cvLink: '',
+                  profile: PROFILES[0].value,
+                  hasGrantedAccess: false,
+                })
+              }}
+              className="pill-btn pill-btn-primary w-full sm:w-auto"
+            >
+              Go Back
+            </button>
           </div>
         </div>
       </section>
@@ -160,50 +163,75 @@ export default function RegisterPage() {
   }
 
   return (
-    <section className="animate-fade-in mx-auto w-full max-w-7xl px-4 py-8 md:px-8 md:py-10">
-      <div className="animate-slide-down mb-8 max-w-[50%] mx-auto">
-        <Image
-          src="/banner.png"
-          alt="CDC Companion Banner"
-          width={1800}
-          height={690}
-          priority
-          className="h-auto w-full rounded-2xl"
-        />
-      </div>
+    <section className="animate-fade-in mx-auto w-full max-w-[95%] px-4 py-8 md:px-8 md:py-10">
+      <header className="animate-slide-down w-full flex flex-col sm:flex-row items-center justify-between py-4 sm:py-6 px-4 mb-6 sm:mb-8 gap-3 sm:gap-0 bg-transparent text-center sm:text-left">
+        <div className="flex items-center gap-3 w-full justify-center sm:justify-start">
+          <Image
+            src="/White logo.png"
+            alt="Communiqué Logo"
+            width={240}
+            height={75}
+            className="w-[80%] sm:w-auto h-auto max-w-[240px] object-contain"
+          />
+        </div>
+        <div>
+          <span className="text-lg sm:text-2xl font-black tracking-widest text-white font-mono uppercase bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+            CDC Companion
+          </span>
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-        <aside className="paper-card animate-slide-up lg:col-span-2 p-6 md:p-8 flex flex-col justify-between">
+        <aside className="animate-slide-up lg:col-span-2 p-0 lg:p-8 flex flex-col justify-between lg:h-full h-fit border-0 lg:border-l-4 border-l-accent transition-all duration-500 hover:border-l-indigo-400 lg:paper-card bg-transparent shadow-none lg:shadow-[0_0_40px_-10px_rgba(59,130,246,0.2)] lg:hover:shadow-[0_0_55px_-5px_rgba(139,92,246,0.4)]">
           <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">CDC Companion</p>
-            <h1 className="mb-3 text-3xl font-black text-[#1b2126]">Submit Your CV For Review</h1>
-            <p className="text-sm text-[#4f5964]">
+            <h1 className="mb-3 text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 tracking-tight leading-tight">
+              Submit Your CV For Review
+            </h1>
+            <p className="text-sm text-[#4f5964] mb-4 lg:mb-6">
               Get structured feedback from experienced seniors to improve role alignment, readability, and impact.
             </p>
+            <div className="hidden sm:block space-y-4 text-xs text-[#4f5964] border-t border-border pt-4">
+              <div className="flex gap-3 items-start animate-fade-in [animation-delay:150ms]">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                <p><strong>Detailed Feedback:</strong> Receive structured feedback on format, relevance, clarity, language, and projects.</p>
+              </div>
+              <div className="flex gap-3 items-start animate-fade-in [animation-delay:250ms]">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                <p><strong>Profile-Specific Matching:</strong> Get reviewed by seniors specialized in your target track (Software, Finance, Consult, Core, Data, Product).</p>
+              </div>
+              <div className="flex gap-3 items-start animate-fade-in [animation-delay:350ms]">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                <p><strong>Senior Advice:</strong> Benefit from the experience of seniors who successfully navigated the CDC placement cycles.</p>
+              </div>
+              <div className="flex gap-3 items-start animate-fade-in [animation-delay:450ms]">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                <p><strong>Secure Status Access:</strong> Keep your checking password safe to view reviewer comments anonymously as soon as they are submitted.</p>
+              </div>
+            </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-border space-y-3">
-            <Link href="/reviewee" className="pill-btn pill-btn-primary w-full text-center block shadow-sm">
+          <div className="mt-6 pt-6 border-t border-border hidden lg:flex flex-col gap-3 w-full">
+            <Link href="/reviewee" className="pill-btn pill-btn-primary w-full text-center block shadow-sm font-bold">
               Check Review Status
             </Link>
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/login/reviewer" className="pill-btn pill-btn-secondary !text-xs !py-2.5 text-center w-full block font-bold">
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <Link href="/login/reviewer" className="pill-btn pill-btn-secondary text-center block font-bold">
                 Reviewer Login
               </Link>
-              <Link href="/login/admin" className="pill-btn pill-btn-secondary !text-xs !py-2.5 text-center w-full block font-bold">
+              <Link href="/login/admin" className="pill-btn pill-btn-secondary text-center block font-bold">
                 Admin Login
               </Link>
             </div>
           </div>
         </aside>
 
-        <div className="paper-card animate-slide-up lg:col-span-3 p-6 md:p-8">
+        <div className="paper-card animate-slide-up lg:col-span-3 p-6 md:p-8 text-[90%]">
           <p aria-live="polite" className={error ? 'status-note mb-5 text-sm' : 'sr-only'}>
             {error || 'No errors'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
-              <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+              <label htmlFor="fullName" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                 Full Name
               </label>
               <input
@@ -222,7 +250,7 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div>
-                <label htmlFor="rollNo" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+                <label htmlFor="rollNo" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                   Roll Number
                 </label>
                 <input
@@ -235,32 +263,34 @@ export default function RegisterPage() {
                   onChange={(e) => handleInputChange('rollNo', e.target.value)}
                   required
                   className="field"
-                  placeholder="Example: 22AB3XXX"
+                  placeholder="Example: 23AB3XXXX"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+                <label htmlFor="email" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                   Institute Email
                 </label>
-                <input
-                  id="email"
-                  name="email"
-                  autoComplete="email"
-                  spellCheck={false}
-                  inputMode="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                  className="field"
-                  placeholder="name@kgpian.iitkgp.ac.in"
-                />
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    spellCheck={false}
+                    inputMode="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    required
+                    className="field"
+                    placeholder="name@kgpian.iitkgp.ac.in"
+                  />
+                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="cvLink" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+              <label htmlFor="cvLink" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                 Google Drive Link to Your CV (PDF)
               </label>
               <input
@@ -276,19 +306,28 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+              <label htmlFor="password" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                 Review Status Checking Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                required
-                className="field"
-                placeholder="Choose a password to check status later"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  required
+                  className="field pr-16 sm:pr-20"
+                  placeholder="Enter checking password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-accent hover:text-accent-strong focus:outline-none"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-start gap-3 rounded-xl border border-border bg-surface-strong p-4">
@@ -306,7 +345,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="profile" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+              <label htmlFor="profile" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
                 Target Profile
               </label>
               <select
@@ -328,6 +367,20 @@ export default function RegisterPage() {
               {isLoading ? 'Submitting CV...' : 'Submit CV For Review'}
             </button>
           </form>
+
+          <div className="mt-8 pt-6 border-t border-border flex lg:hidden flex-col gap-3 w-full animate-fade-in">
+            <Link href="/reviewee" className="pill-btn pill-btn-primary w-full text-center block shadow-sm font-bold">
+              Check Review Status
+            </Link>
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <Link href="/login/reviewer" className="pill-btn pill-btn-secondary text-center block font-bold">
+                Reviewer Login
+              </Link>
+              <Link href="/login/admin" className="pill-btn pill-btn-secondary text-center block font-bold">
+                Admin Login
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

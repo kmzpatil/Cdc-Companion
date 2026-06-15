@@ -51,7 +51,6 @@ export default function ReviewerDashboardPage() {
   const [selectedAssigned, setSelectedAssigned] = useState<AssignedReview | null>(null)
   const [ratings, setRatings] = useState<string[]>(['', '', '', '', '', ''])
   const [submittedAssigned, setSubmittedAssigned] = useState(false)
-  const [showPDF, setShowPDF] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
@@ -172,7 +171,7 @@ export default function ReviewerDashboardPage() {
   }
 
   return (
-    <section className="animate-fade-in mx-auto w-full max-w-7xl space-y-6 px-4 py-8 md:px-8">
+    <section className="animate-fade-in mx-auto w-full max-w-[95%] space-y-6 px-4 py-8 md:px-8">
       <header className="paper-card animate-slide-down flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div>
           <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">Reviewer Dashboard</p>
@@ -274,38 +273,29 @@ export default function ReviewerDashboardPage() {
 
                   {isSelected && (
                     <div className="mt-6 border-t border-border pt-6 animate-scale-in">
-                      <div className="grid gap-6 md:grid-cols-3">
-                        <div className="md:col-span-1">
+                      <div className="grid gap-6 lg:grid-cols-5">
+                        <div className="lg:col-span-3">
                           <h3 className="mb-3 text-sm font-bold text-[#1b2126]">CV Document</h3>
                           <div className="rounded-xl border border-border bg-surface-strong overflow-hidden">
-                            {showPDF ? (
-                              <iframe
-                                src={(() => {
-                                  const url = review.cvLink;
-                                  if (!url) return '';
-                                  if (url.includes('drive.google.com')) {
-                                    let embedUrl = url;
-                                    if (embedUrl.includes('/view')) {
-                                      embedUrl = embedUrl.split('/view')[0] + '/preview';
-                                    } else if (embedUrl.includes('/edit')) {
-                                      embedUrl = embedUrl.split('/edit')[0] + '/preview';
-                                    }
-                                    return embedUrl;
+                            <iframe
+                              src={(() => {
+                                const url = review.cvLink;
+                                if (!url) return '';
+                                if (url.includes('drive.google.com')) {
+                                  let embedUrl = url;
+                                  if (embedUrl.includes('/view')) {
+                                    embedUrl = embedUrl.split('/view')[0] + '/preview';
+                                  } else if (embedUrl.includes('/edit')) {
+                                    embedUrl = embedUrl.split('/edit')[0] + '/preview';
                                   }
-                                  return url;
-                                })()}
-                                className="h-[400px] w-full border-0"
-                                title="CV PDF Viewer"
-                                allow="autoplay"
-                              />
-                            ) : (
-                              <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
-                                <p className="text-xs text-[#4f5964]">CV ready for review</p>
-                                <button onClick={() => setShowPDF(true)} className="pill-btn pill-btn-primary !text-xs !min-h-[2.1rem]">
-                                  View CV
-                                </button>
-                              </div>
-                            )}
+                                  return embedUrl;
+                                }
+                                return url;
+                              })()}
+                              className="h-[750px] w-full border-0"
+                              title="CV PDF Viewer"
+                              allow="autoplay"
+                            />
                           </div>
                           <div className="mt-3 flex flex-col gap-2">
                             {review.cvLink && (
@@ -318,18 +308,10 @@ export default function ReviewerDashboardPage() {
                                 Open CV in New Tab
                               </a>
                             )}
-                            {showPDF && (
-                              <button
-                                onClick={() => setShowPDF(false)}
-                                className="pill-btn pill-btn-secondary w-full text-xs !min-h-[2.1rem]"
-                              >
-                                Hide PDF
-                              </button>
-                            )}
                           </div>
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div className="lg:col-span-2">
                           {submittedAssigned ? (
                             <div className="rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/30 dark:bg-emerald-950/10 p-6 text-center">
                               <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-400">Review submitted successfully!</p>
@@ -354,7 +336,7 @@ export default function ReviewerDashboardPage() {
                                   This candidate has already been reviewed. You can modify the text below to update their review.
                                 </div>
                               )}
-                              <div className="grid gap-4 md:grid-cols-2">
+                              <div className="grid gap-4 grid-cols-1">
                                 {FEEDBACK_FIELDS.map((label, index) => (
                                   <div
                                     key={label}

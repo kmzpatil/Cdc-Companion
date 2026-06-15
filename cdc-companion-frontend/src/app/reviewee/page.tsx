@@ -34,7 +34,7 @@ export default function RevieweeDashboardPage() {
   const [feedback, setFeedback] = useState<ReviewFeedback | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
-  const [showPDF, setShowPDF] = useState(false)
+  const [showPDF, setShowPDF] = useState(true)
 
   const fetchSubmission = async (targetEmail: string, targetPassword?: string) => {
     setLoading(true)
@@ -141,7 +141,7 @@ export default function RevieweeDashboardPage() {
   // Render Search Page if no active session/submission loaded
   if (!submission) {
     return (
-      <section className="animate-fade-in mx-auto flex min-h-[85vh] w-full max-w-7xl flex-col items-center justify-center px-4 py-8 md:px-8">
+      <section className="animate-fade-in mx-auto flex min-h-[85vh] w-full max-w-[95%] flex-col items-center justify-center px-4 py-8 md:px-8">
         <header className="mb-8 text-center space-y-2">
           <Link href="/" className="pill-btn pill-btn-secondary inline-block mb-4">
             Back to Submission Page
@@ -212,7 +212,7 @@ export default function RevieweeDashboardPage() {
 
   // Render Dashboard
   return (
-    <section className="animate-fade-in mx-auto w-full max-w-6xl space-y-6 px-4 py-8 md:px-8">
+    <section className="animate-fade-in mx-auto w-full max-w-[95%] space-y-6 px-4 py-8 md:px-8">
       <header className="paper-card animate-slide-down p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="mb-1 text-sm font-semibold uppercase tracking-[0.15em] text-accent">Your Review Status</p>
@@ -232,11 +232,16 @@ export default function RevieweeDashboardPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
         {/* Left column - CV display */}
-        <section className="paper-card animate-slide-up md:col-span-2 p-6 md:p-8 flex flex-col justify-between">
+        <section className="paper-card animate-slide-up lg:col-span-6 p-6 md:p-8 flex flex-col justify-between h-fit">
           <div>
-            <h2 className="mb-4 text-xl font-bold text-[#1b2126]">Your Submitted CV</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[#1b2126]">Your Submitted CV</h2>
+              <span className="text-xs font-bold bg-surface-strong text-[#1b2126] px-3 py-1 rounded-md">
+                Track: {submission.profile}
+              </span>
+            </div>
             <div className="rounded-xl border border-border bg-surface overflow-hidden">
               {showPDF ? (
                 <iframe
@@ -254,12 +259,12 @@ export default function RevieweeDashboardPage() {
                     }
                     return url;
                   })()}
-                  className="h-[500px] w-full border-0"
+                  className="h-[700px] w-full border-0"
                   title="CV PDF Viewer"
                   allow="autoplay"
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center gap-4 py-16">
+                <div className="flex flex-col items-center justify-center gap-4 py-32">
                   <div className="text-center">
                     <p className="text-sm font-semibold text-[#1b2126]">CV File Available</p>
                     <p className="text-xs text-[#5a5f66] mt-1">Review the document directly on our page.</p>
@@ -297,92 +302,50 @@ export default function RevieweeDashboardPage() {
           </div>
         </section>
 
-        {/* Right column - Summary cards */}
-        <section className="space-y-4 md:col-span-1">
-          <div className="paper-card animate-slide-down p-6 space-y-4">
-            <h3 className="text-lg font-bold text-[#1b2126] border-b border-border pb-2">Submission Details</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] font-semibold text-[#5a5f66]">Target Career Track</p>
-                <span className="mt-1 inline-block text-xs font-bold bg-surface-strong text-foreground px-3 py-1 rounded-md">
-                  {submission.profile}
-                </span>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] font-semibold text-[#5a5f66]">Review Status</p>
-                <span
-                  className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-                    submission.status ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400'
-                  }`}
-                >
-                  {submission.status ? 'Completed' : 'Pending Allocation / Review'}
-                </span>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] font-semibold text-[#5a5f66]">Submitted On</p>
-                <p className="mt-1 text-xs font-medium text-[#1b2126]">
-                  {new Date(submission.submissionTime).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {feedback && (
-            <div className="paper-card animate-slide-up p-6 border border-emerald-200 bg-emerald-50 dark:border-emerald-900/30 dark:bg-emerald-950/10">
-              <h3 className="text-base font-bold text-emerald-800 dark:text-emerald-400 border-b border-emerald-100 dark:border-emerald-900/20 pb-2">Evaluator Snapshot</h3>
-              <div className="mt-3 space-y-2">
+        {/* Right column - Feedback / Pending Status */}
+        <section className="lg:col-span-6 space-y-6">
+          {feedback ? (
+            <div className="paper-card animate-slide-up p-6 md:p-8 space-y-6 h-fit">
+              <div className="border-b border-border pb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.08em] text-[#347644] dark:text-emerald-500 font-medium">Assigned Senior</p>
-                  <p className="text-sm font-bold text-[#1b2126]">{feedback.reviewer.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.08em] text-[#347644] dark:text-emerald-500 font-medium">Completed On</p>
-                  <p className="text-xs font-medium text-[#5a5f66]">
-                    {new Date(feedback.submissionTime).toLocaleString()}
+                  <h2 className="text-2xl font-black text-[#1b2126]">Detailed Feedback</h2>
+                  <p className="mt-1 text-xs text-[#4f5964]">
+                    Diagnostic evaluation of your CV by senior reviewers.
                   </p>
                 </div>
+                <span className="rounded-full px-3 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
+                  Completed
+                </span>
               </div>
+              <div className="space-y-4">
+                {feedbackLabels.map((label, index) => (
+                  <article
+                    key={label}
+                    className="animate-scale-in rounded-xl border border-border bg-surface p-4 transition-all duration-200 hover:border-accent hover:shadow-sm"
+                  >
+                    <h3 className="mb-1 text-xs font-black text-accent uppercase tracking-[0.05em]">{label}</h3>
+                    <p className="text-sm leading-relaxed text-[#1b2126] font-medium whitespace-pre-line">
+                      {feedback.comments[index] || 'No comments provided.'}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="paper-card animate-slide-up p-8 text-center space-y-4 h-fit border border-amber-200 bg-amber-50/50">
+              <div className="text-2xl">⏳</div>
+              <h3 className="text-lg font-bold text-[#1b2126]">Pending Diagnostic Feedback</h3>
+              <p className="text-xs text-[#5a5f66]">
+                Track: <strong className="text-foreground">{submission.profile}</strong> • Status: <strong className="text-amber-700">Pending Review</strong>
+              </p>
+              <p className="text-sm text-[#4f5964]">
+                Your CV is currently queued for evaluation by our specialized reviewers. 
+                We&apos;ll send you an automated email at **{submission.email}** as soon as the review is complete!
+              </p>
             </div>
           )}
         </section>
       </div>
-
-      {/* Feedback Section */}
-      {feedback ? (
-        <section className="paper-card animate-slide-up space-y-6 p-6 md:p-8">
-          <div className="border-b border-border pb-4">
-            <h2 className="text-2xl font-black text-[#1b2126]">Seniors&apos; Detailed Feedback</h2>
-            <p className="mt-1 text-sm text-[#4f5964]">
-              Here is the diagnostic evaluation of your CV compiled by **{feedback.reviewer.name}**.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {feedbackLabels.map((label, index) => (
-              <article
-                key={label}
-                className="animate-scale-in rounded-xl border border-border bg-surface p-5 transition-all duration-200 hover:border-accent hover:shadow-sm"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <h3 className="mb-2 text-sm font-black text-accent uppercase tracking-[0.05em]">{label}</h3>
-                <p className="text-sm leading-relaxed text-[#1b2126] font-medium whitespace-pre-line">
-                  {feedback.comments[index] || 'No comments provided.'}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : (
-        <section className="paper-card animate-slide-up p-8 text-center space-y-4">
-          <div>
-            <h3 className="text-lg font-bold text-[#1b2126]">Pending Diagnostic Feedback</h3>
-            <p className="mt-1 text-sm text-[#4f5964] max-w-md mx-auto">
-              Your CV has been registered and is currently queued for evaluation by our specialized reviewers. 
-              We&apos;ll send you an automated email at **{submission.email}** as soon as the review is complete!
-            </p>
-          </div>
-        </section>
-      )}
     </section>
   )
 }

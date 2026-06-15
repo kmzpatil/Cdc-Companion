@@ -15,6 +15,10 @@ interface Reviewee {
   status: boolean
   submissionTime: string
   assignedToId: number | null
+  assignedTo?: {
+    id: number
+    name: string
+  } | null
 }
 
 interface Reviewer {
@@ -58,7 +62,17 @@ function sortIcon(state: SortState, column: string): string {
   return 'Sort'
 }
 
-function RevieweesTable({ reviewees, onDelete }: { reviewees: Reviewee[]; onDelete: (id: number) => void }) {
+function RevieweesTable({
+  reviewees,
+  reviewers,
+  onReassign,
+  onDelete,
+}: {
+  reviewees: Reviewee[]
+  reviewers: Reviewer[]
+  onReassign: (revieweeId: number, reviewerId: number | null) => void
+  onDelete: (id: number) => void
+}) {
   const [sortState, setSortState] = useState<SortState>({ column: null, direction: null })
 
   const sortedReviewees = useMemo(() => {
@@ -121,7 +135,23 @@ function RevieweesTable({ reviewees, onDelete }: { reviewees: Reviewee[]; onDele
                 <td>{reviewee.name}</td>
                 <td>{reviewee.rollNo}</td>
                 <td>{reviewee.profile}</td>
-                <td>{reviewee.assignedToId ?? 'Unassigned'}</td>
+                 <td>
+                  <select
+                    value={reviewee.assignedToId ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      onReassign(reviewee.id, val ? parseInt(val, 10) : null)
+                    }}
+                    className="field !min-h-[2.1rem] !py-1 !px-2 !text-xs w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
+                  >
+                    <option value="">Unassigned</option>
+                    {reviewers.map((reviewer) => (
+                      <option key={reviewer.id} value={reviewer.id}>
+                        {reviewer.name} ({reviewer.reviewedCount}/{reviewer.reviewsNumber})
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td>{reviewee.status ? 'Reviewed' : 'Pending'}</td>
                 <td>
                   <button
@@ -141,7 +171,15 @@ function RevieweesTable({ reviewees, onDelete }: { reviewees: Reviewee[]; onDele
   )
 }
 
-function ReviewersTable({ reviewers, onDelete }: { reviewers: Reviewer[]; onDelete: (id: number) => void }) {
+function ReviewersTable({
+  reviewers,
+  onReassign,
+  onDelete,
+}: {
+  reviewers: Reviewer[]
+  onReassign: (revieweeId: number, reviewerId: number | null) => void
+  onDelete: (id: number) => void
+}) {
   const [sortState, setSortState] = useState<SortState>({ column: null, direction: null })
 
   const sortedReviewers = useMemo(() => {
@@ -221,7 +259,33 @@ function ReviewersTable({ reviewers, onDelete }: { reviewers: Reviewer[]; onDele
                 <td>
                   {reviewer.reviewedCount} / {reviewer.reviewsNumber}
                 </td>
-                <td>{reviewer.assignedCVs.length}</td>
+                 <td>
+                  {reviewer.assignedCVs && reviewer.assignedCVs.length > 0 ? (
+                    <div className="flex flex-col gap-1.5">
+                      {reviewer.assignedCVs.map((cv) => (
+                        <div
+                          key={cv.id}
+                          className="flex items-center justify-between gap-2 rounded bg-surface-strong px-2 py-1 text-xs border border-border"
+                        >
+                          <span className="font-semibold text-foreground">{cv.name} ({cv.profile})</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Unassign ${cv.name} from ${reviewer.name}?`)) {
+                                onReassign(cv.id, null)
+                              }
+                            }}
+                            className="text-[10px] font-bold text-red-500 hover:text-red-700 hover:underline"
+                          >
+                            Unassign
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted">None</span>
+                  )}
+                </td>
                 <td>
                   <button
                     type="button"
@@ -441,6 +505,31 @@ export default function AdminDashboardPage() {
     router.push('/login/admin')
   }
 
+  const handleReassign = async (revieweeId: number, reviewerId: number | null) => {
+    try {
+      const res = await authFetch(`${BACKEND_URL}/api/admin/reassign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ revieweeId, reviewerId }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to update assignment')
+      }
+
+      const [revieweesRes, reviewersRes] = await Promise.all([
+        authFetch(`${BACKEND_URL}/api/admin/reviewees`),
+        authFetch(`${BACKEND_URL}/api/admin/reviewers`),
+      ])
+
+      if (revieweesRes.ok) setReviewees(await revieweesRes.json())
+      if (reviewersRes.ok) setReviewers(await reviewersRes.json())
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Reassignment failed')
+    }
+  }
+
   if (loading) {
     return (
       <section className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-4 py-10">
@@ -450,7 +539,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <section className="animate-fade-in mx-auto w-full max-w-7xl space-y-6 px-4 py-8 md:px-8">
+    <section className="animate-fade-in mx-auto w-full max-w-[95%] space-y-6 px-4 py-8 md:px-8">
       <header className="paper-card animate-slide-down flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div>
           <p className="mb-2 text-sm font-semibold uppercase tracking-[0.15em] text-accent">Admin Dashboard</p>
@@ -472,10 +561,10 @@ export default function AdminDashboardPage() {
       </p>
 
       <div className="animate-slide-up">
-        <RevieweesTable reviewees={reviewees} onDelete={handleDeleteReviewee} />
+        <RevieweesTable reviewees={reviewees} reviewers={reviewers} onReassign={handleReassign} onDelete={handleDeleteReviewee} />
       </div>
       <div className="animate-slide-up">
-        <ReviewersTable reviewers={reviewers} onDelete={handleDeleteReviewer} />
+        <ReviewersTable reviewers={reviewers} onReassign={handleReassign} onDelete={handleDeleteReviewer} />
       </div>
       <div className="animate-slide-up">
         <ReviewsTable reviews={reviews} onDelete={handleDeleteReview} />

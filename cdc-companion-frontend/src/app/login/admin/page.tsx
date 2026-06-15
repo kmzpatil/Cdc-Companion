@@ -10,6 +10,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -70,17 +71,26 @@ export default function AdminLoginPage() {
             <label htmlFor="adminPassword" className="mb-2 block text-sm font-semibold text-[#1b2126]">
               Password
             </label>
-            <input
-              id="adminPassword"
-              name="current-password"
-              autoComplete="current-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="field"
-              placeholder="Enter your password"
-            />
+            <div className="relative">
+              <input
+                id="adminPassword"
+                name="current-password"
+                autoComplete="current-password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="field pr-16"
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-accent hover:text-accent-strong focus:outline-none"
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="pill-btn pill-btn-primary w-full" disabled={isLoading}>
