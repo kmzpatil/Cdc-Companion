@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
 import { sendRegistrationEmail } from './mailer'
-
-const prisma = new PrismaClient()
+import prisma from '../prisma'
 
 /**
  * POST /api/reviewee/submit
@@ -35,12 +33,10 @@ export default class RevieweeController {
 
       console.log("cv submitted")
 
-      // Send confirmation email containing their details and password
-      try {
-        await sendRegistrationEmail(email, name, password, cvLink, profile)
-      } catch (mailErr) {
+      // Send confirmation email containing their details and password asynchronously
+      sendRegistrationEmail(email, name, password, cvLink, profile).catch((mailErr) => {
         console.error("Failsafe: Error sending registration email:", mailErr)
-      }
+      })
 
       return res.status(201).json(reviewee)
     } catch (err: any) {

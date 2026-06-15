@@ -1,22 +1,9 @@
 // src/controllers/ReviewerController.ts
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
-import nodemailer from 'nodemailer'
 import { sendReviewEmail } from './mailer'
+import prisma from '../prisma'
 
-const prisma = new PrismaClient()
-
-// configure your transporter once
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER!,
-    pass: process.env.SMTP_PASS!,
-  },
-})
 
 interface JwtPayload {
   id: number
@@ -210,11 +197,14 @@ const formattedComments = labels.map((label, idx) =>
   `${label}: ${comments[idx]}`
 )
 
-await sendReviewEmail({
+sendReviewEmail({
   to: re.email,
   userName: re.name,
   reviewComments: formattedComments,
+}).catch((mailErr) => {
+  console.error("Failsafe: Error sending review email:", mailErr)
 })
+
 
 
       }

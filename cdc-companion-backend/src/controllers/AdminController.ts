@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import prisma from '../prisma'
 
-const prisma = new PrismaClient()
 
 function normalizeProfile(p: string): string {
   const upper = p.toUpperCase().replace(/\s+/g, '').replace(/[-_\/]/g, '');
@@ -20,7 +19,7 @@ export default class AdminController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, password } = req.body
-      const admin = await prisma.admin.findFirst({ where: { name } })
+      const admin = await prisma.admin.findUnique({ where: { name } })
       if (!admin || admin.password !== password) {
         return res.status(401).json({ error: 'Invalid credentials' })
       }

@@ -8,7 +8,6 @@ datasource db {
 }
 
 
-/// A student submitting a single CV
 model Reviewee {
   id           Int       @id @default(autoincrement())
   name         String
@@ -28,11 +27,13 @@ model Reviewee {
   assignedTo   Reviewer? @relation(fields: [assignedToId], references: [id])
   assignedToId Int?
   review       Review?
+
+  @@index([email])
 }
 
 model Admin {
   id           Int       @id @default(autoincrement())
-  name         String
+  name         String    @unique
   password     String
 }
 

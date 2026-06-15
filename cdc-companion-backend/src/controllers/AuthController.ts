@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import prisma from '../prisma'
 
 const secret = process.env.JWT_SECRET
 if (!secret) {
   throw new Error('JWT_SECRET environment variable is not set')
 }
 
-const prisma = new PrismaClient()
 
 export default class AuthController {
   /**

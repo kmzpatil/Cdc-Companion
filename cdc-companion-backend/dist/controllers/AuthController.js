@@ -12,13 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const prisma_1 = __importDefault(require("../prisma"));
 const secret = process.env.JWT_SECRET;
 if (!secret) {
     throw new Error('JWT_SECRET environment variable is not set');
 }
-const prisma = new client_1.PrismaClient();
 class AuthController {
     /**
      * POST /api/auth/login
@@ -32,7 +31,7 @@ class AuthController {
                 if (!name || !password) {
                     return res.status(400).json({ error: 'Missing name or password' });
                 }
-                const user = yield prisma.reviewer.findUnique({ where: { name } });
+                const user = yield prisma_1.default.reviewer.findUnique({ where: { name } });
                 if (!user || user.password !== password) {
                     return res.status(401).json({ error: 'Invalid credentials' });
                 }

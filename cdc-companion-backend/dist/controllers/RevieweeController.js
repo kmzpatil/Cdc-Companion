@@ -8,10 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
 const mailer_1 = require("./mailer");
-const prisma = new client_1.PrismaClient();
+const prisma_1 = __importDefault(require("../prisma"));
 /**
  * POST /api/reviewee/submit
  * Body: { name, rollNo, email, password, cvLink, profile }
@@ -27,7 +29,7 @@ class RevieweeController {
                 if (!cvLink.includes('drive.google.com') && !cvLink.includes('docs.google.com')) {
                     return res.status(400).json({ error: 'Please submit a valid Google Drive or Google Docs link.' });
                 }
-                const reviewee = yield prisma.reviewee.create({
+                const reviewee = yield prisma_1.default.reviewee.create({
                     data: {
                         name,
                         rollNo,
@@ -38,13 +40,10 @@ class RevieweeController {
                     },
                 });
                 console.log("cv submitted");
-                // Send confirmation email containing their details and password
-                try {
-                    yield (0, mailer_1.sendRegistrationEmail)(email, name, password, cvLink, profile);
-                }
-                catch (mailErr) {
+                // Send confirmation email containing their details and password asynchronously
+                (0, mailer_1.sendRegistrationEmail)(email, name, password, cvLink, profile).catch((mailErr) => {
                     console.error("Failsafe: Error sending registration email:", mailErr);
-                }
+                });
                 return res.status(201).json(reviewee);
             }
             catch (err) {
@@ -63,7 +62,7 @@ class RevieweeController {
                 if (!email || !password) {
                     return res.status(400).json({ error: 'Missing email or password' });
                 }
-                const submission = yield prisma.reviewee.findFirst({
+                const submission = yield prisma_1.default.reviewee.findFirst({
                     where: { email },
                     include: {
                         review: {
@@ -117,7 +116,7 @@ class RevieweeController {
                 if (!email) {
                     return res.status(400).json({ error: 'Missing email' });
                 }
-                const submission = yield prisma.reviewee.findFirst({
+                const submission = yield prisma_1.default.reviewee.findFirst({
                     where: { email },
                     include: {
                         review: {
