@@ -407,33 +407,33 @@ function parseMarkdownToHtml(markdown: string): string {
     if (trimmed.startsWith('#### ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(5).trim();
-      output.push(`<h5 class="text-sm font-bold text-accent dark:text-accent mt-4 mb-1 uppercase tracking-wider">${escapeHtml(content)}</h5>`);
+      output.push(`<h5 class="text-sm font-bold text-accent dark:text-accent mt-5 mb-1 uppercase tracking-wider">${escapeHtml(content)}</h5>`);
       continue;
     }
     if (trimmed.startsWith('### ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(4).trim();
-      output.push(`<h4 class="text-base font-bold text-[#1b2126] dark:text-white mt-5 mb-2">${escapeHtml(content)}</h4>`);
+      output.push(`<h4 class="text-lg font-bold text-accent dark:text-accent mt-6 mb-3 border-b border-border/50 pb-1">${escapeHtml(content)}</h4>`);
       continue;
     }
     if (trimmed.startsWith('## ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(3).trim();
-      output.push(`<h3 class="text-lg font-bold text-[#1b2126] dark:text-white mt-6 mb-2">${escapeHtml(content)}</h3>`);
+      output.push(`<h3 class="text-xl font-extrabold text-[#1b2126] dark:text-white mt-7 mb-3 border-b border-border pb-1">${escapeHtml(content)}</h3>`);
       continue;
     }
     if (trimmed.startsWith('# ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(2).trim();
-      output.push(`<h2 class="text-xl font-bold text-[#1b2126] dark:text-white mt-6 mb-3">${escapeHtml(content)}</h2>`);
+      output.push(`<h2 class="text-2xl font-black text-[#1b2126] dark:text-white mt-8 mb-4 border-b-2 border-border pb-2">${escapeHtml(content)}</h2>`);
       continue;
     }
 
     // Bullet points — group into <ul>
     if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-      if (!inList) { output.push('<ul class="list-disc ml-5 space-y-1 my-2">'); inList = true; }
+      if (!inList) { output.push('<ul class="list-disc ml-5 space-y-3 my-4">'); inList = true; }
       const content = trimmed.substring(2).trim();
-      output.push(`<li class="text-sm text-[#4f5964] dark:text-gray-300 leading-relaxed">${parseInlineMarkdown(content)}</li>`);
+      output.push(`<li class="text-sm text-[#333a42] dark:text-gray-200 leading-relaxed marker:text-accent">${parseInlineMarkdown(content)}</li>`);
       continue;
     }
 
@@ -443,7 +443,7 @@ function parseMarkdownToHtml(markdown: string): string {
       // Only add a spacer if we have content and the last thing wasn't already a spacer/heading
       const last = output[output.length - 1] || '';
       if (last && !last.startsWith('<div class="h-') && !last.startsWith('</ul>') && !last.match(/^<h[2-5]/)) {
-        output.push('<div class="h-2"></div>');
+        output.push('<div class="h-4"></div>');
       }
       continue;
     }
@@ -468,7 +468,7 @@ function escapeHtml(text: string): string {
 function parseInlineMarkdown(text: string): string {
   let escaped = escapeHtml(text);
   // Bold: **text**
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-[#1b2126] dark:text-white">$1</strong>');
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-[#111827] dark:text-gray-100">$1</strong>');
   // Italic: *text* or _text_
   escaped = escaped.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
   return escaped;

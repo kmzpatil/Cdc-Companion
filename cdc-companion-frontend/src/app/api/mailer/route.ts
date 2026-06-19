@@ -457,36 +457,36 @@ function parseMarkdownToHtml(markdown: string): string {
     if (trimmed.startsWith('#### ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(5).trim();
-      output.push(`<h5 style="margin-top:12px;margin-bottom:4px;font-size:13px;color:#047857;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(content)}</h5>`);
+      output.push(`<h5 style="margin-top:16px;margin-bottom:6px;font-size:14px;color:#10b981;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(content)}</h5>`);
       continue;
     }
     if (trimmed.startsWith('### ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(4).trim();
-      output.push(`<h4 style="margin-top:16px;margin-bottom:6px;font-size:15px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h4>`);
+      output.push(`<h4 style="margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e2e8f0;font-size:18px;color:#047857;font-weight:700;">${escapeHtml(content)}</h4>`);
       continue;
     }
     if (trimmed.startsWith('## ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(3).trim();
-      output.push(`<h3 style="margin-top:20px;margin-bottom:8px;font-size:17px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h3>`);
+      output.push(`<h3 style="margin-top:28px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #cbd5e1;font-size:22px;color:#1e293b;font-weight:800;">${escapeHtml(content)}</h3>`);
       continue;
     }
     if (trimmed.startsWith('# ')) {
       if (inList) { output.push('</ul>'); inList = false; }
       const content = trimmed.substring(2).trim();
-      output.push(`<h2 style="margin-top:24px;margin-bottom:10px;font-size:19px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h2>`);
+      output.push(`<h2 style="margin-top:32px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #cbd5e1;font-size:26px;color:#0f172a;font-weight:900;">${escapeHtml(content)}</h2>`);
       continue;
     }
 
     // Bullet points — group into <ul>
     if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
       if (!inList) {
-        output.push('<ul style="margin:8px 0;padding-left:20px;">');
+        output.push('<ul style="margin:16px 0;padding-left:24px;">');
         inList = true;
       }
       const content = trimmed.substring(2).trim();
-      output.push(`<li style="font-size:14px;color:#475569;margin-bottom:4px;line-height:1.6;">${parseInlineMarkdown(content)}</li>`);
+      output.push(`<li style="font-size:15px;color:#334155;margin-bottom:10px;line-height:1.7;">${parseInlineMarkdown(content)}</li>`);
       continue;
     }
 
@@ -495,7 +495,7 @@ function parseMarkdownToHtml(markdown: string): string {
       if (inList) { output.push('</ul>'); inList = false; }
       const last = output[output.length - 1] || '';
       if (last && !last.startsWith('<div style="height:') && !last.startsWith('</ul>') && !last.match(/^<h[2-5]/)) {
-        output.push('<div style="height:6px;"></div>');
+        output.push('<div style="height:12px;"></div>');
       }
       continue;
     }
@@ -520,7 +520,7 @@ function escapeHtml(text: string): string {
 function parseInlineMarkdown(text: string): string {
   let escaped = escapeHtml(text);
   // Bold: **text**
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:700;color:#0f172a;">$1</strong>');
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:800;color:#0f172a;">$1</strong>');
   // Italic: *text*
   escaped = escaped.replace(/\*(.*?)\*/g, '<em style="font-style:italic;">$1</em>');
   return escaped;
