@@ -374,9 +374,9 @@
             FORMATTING RULES:
             - DO NOT write any introduction, preamble, or commentary.
             - Start DIRECTLY with the first section heading.
-            - Use markdown headings (###) for each section.
-            - Use bullet points (-) for individual suggestions.
-            - If providing a rewrite, use "**Before:**" and "**After:**" formatting.
+            - YOU MUST use markdown headings (###) for EVERY section title (e.g., ### Tech Stack Audit). Do not just bold the text.
+            - Use bullet points (-) for individual suggestions under each section.
+            - If providing a rewrite, use "**Before:**" and "**After:**" formatting on the SAME LINE as the bullet point.
             
             Candidate Profile/Track: ${re.profile}
             Reviewer's Diagnostic Feedback:

@@ -403,29 +403,37 @@ function parseMarkdownToHtml(markdown: string): string {
     const line = lines[i];
     const trimmed = line.trim();
 
-    // Headings
-    if (trimmed.startsWith('#### ')) {
+    // Headings (Resilient to missing spaces)
+    const h5Match = trimmed.match(/^####\s*(.*)$/);
+    if (h5Match) {
       if (inList) { output.push('</ul>'); inList = false; }
-      const content = trimmed.substring(5).trim();
-      output.push(`<h5 class="text-sm font-bold text-accent dark:text-accent mt-5 mb-1 uppercase tracking-wider">${escapeHtml(content)}</h5>`);
+      output.push(`<h5 class="text-sm font-bold text-accent dark:text-accent mt-5 mb-1 uppercase tracking-wider">${escapeHtml(h5Match[1])}</h5>`);
       continue;
     }
-    if (trimmed.startsWith('### ')) {
+    const h4Match = trimmed.match(/^###\s*(.*)$/);
+    if (h4Match) {
       if (inList) { output.push('</ul>'); inList = false; }
-      const content = trimmed.substring(4).trim();
-      output.push(`<h4 class="text-lg font-bold text-accent dark:text-accent mt-6 mb-3 border-b border-border/50 pb-1">${escapeHtml(content)}</h4>`);
+      output.push(`<h4 class="text-lg font-bold text-accent dark:text-accent mt-6 mb-3 border-b border-border/50 pb-1">${escapeHtml(h4Match[1])}</h4>`);
       continue;
     }
-    if (trimmed.startsWith('## ')) {
+    const h3Match = trimmed.match(/^##\s*(.*)$/);
+    if (h3Match) {
       if (inList) { output.push('</ul>'); inList = false; }
-      const content = trimmed.substring(3).trim();
-      output.push(`<h3 class="text-xl font-extrabold text-[#1b2126] dark:text-white mt-7 mb-3 border-b border-border pb-1">${escapeHtml(content)}</h3>`);
+      output.push(`<h3 class="text-xl font-extrabold text-[#1b2126] dark:text-white mt-7 mb-3 border-b border-border pb-1">${escapeHtml(h3Match[1])}</h3>`);
       continue;
     }
-    if (trimmed.startsWith('# ')) {
+    const h2Match = trimmed.match(/^#\s*(.*)$/);
+    if (h2Match) {
       if (inList) { output.push('</ul>'); inList = false; }
-      const content = trimmed.substring(2).trim();
-      output.push(`<h2 class="text-2xl font-black text-[#1b2126] dark:text-white mt-8 mb-4 border-b-2 border-border pb-2">${escapeHtml(content)}</h2>`);
+      output.push(`<h2 class="text-2xl font-black text-[#1b2126] dark:text-white mt-8 mb-4 border-b-2 border-border pb-2">${escapeHtml(h2Match[1])}</h2>`);
+      continue;
+    }
+
+    // Standalone bold text as a heading fallback
+    const boldHeadingMatch = trimmed.match(/^\*\*([^*]+)\*\*$/);
+    if (boldHeadingMatch) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      output.push(`<h4 class="text-lg font-bold text-accent dark:text-accent mt-6 mb-3 border-b border-border/50 pb-1">${escapeHtml(boldHeadingMatch[1].trim())}</h4>`);
       continue;
     }
 
