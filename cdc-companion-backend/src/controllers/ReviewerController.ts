@@ -242,180 +242,6 @@
           })
         }
 
-        // 1. Extract CV text from link using a Node.js extractor
-        let cvText = ''
-        if (re.cvLink) {
-          cvText = await extractTextFromLink(re.cvLink)
-        }
-
-        // 1.5 Load AI Spec Domain Guidelines based on profile
-        let domainGuidelines = ''
-        try {
-          if (re.profile) {
-            const mappedName = re.profile.replace(/[\/\\]/g, '').replace(/\s+/g, '') // e.g., "Product / FMCG" -> "ProductFMCG"
-            const specPath = path.join(__dirname, 'AI_Specs', `${mappedName}.md`)
-            if (fs.existsSync(specPath)) {
-              domainGuidelines = fs.readFileSync(specPath, 'utf8')
-              console.log(`[LLM PROCESS] Loaded AI Spec for profile ${re.profile}`)
-            } else {
-              console.log(`[LLM PROCESS] No AI Spec found at ${specPath} for profile ${re.profile}`)
-            }
-          }
-        } catch (e) {
-          console.error('Could not load domain guidelines for profile:', re.profile, e)
-        }
-
-        // 2. Generate AI Suggestions using primary Gemini API, fallback to Groq
-        let aiSuggestions = ''
-        
-        const geminiKeysStr = process.env.GEMINI_API_KEYS || ''
-        const geminiKeys = geminiKeysStr.split(',').map(k => k.trim()).filter(Boolean)
-        const groqKeysStr = process.env.GROQ_API_KEYS || ''
-        const groqKeys = groqKeysStr.split(',').map(k => k.trim()).filter(Boolean)
-        const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
-
-        // Fetch API indices from Database
-        let state = await prisma.systemState.findUnique({ where: { id: 'global' } })
-        if (!state) {
-          state = await prisma.systemState.create({ data: { id: 'global' } })
-        }
-        
-        const labels = [
-          'Structure & Format',
-          'Relevance to Domain',
-          'Depth of Explanation',
-          'Language and Grammar',
-          'Improvements in Projects',
-          'Additional Suggestions',
-        ]
-        const commentsText = comments.map((c, i) => `${labels[i] || 'Feedback'}: ${c}`).join('\n')
-
-        const prompt = `
-        You are a ruthless, expert technical resume reviewer for engineering and quantitative placements at IIT Kharagpur. You are reviewing a 1-page technical CV.
-        
-        CRITICAL CONSTRAINTS — YOU WILL BE PENALIZED FOR VIOLATING THESE:
-        1. IGNORE TEXT PARSING ARTIFACTS: The provided CV text is machine-extracted. Table headers or columns may appear mashed together (e.g., "YearDegree/ExamInstituteCGPA/Marks"). DO NOT suggest formatting fixes for these obvious extraction artifacts.
-        2. ZERO HR FLUFF: KGP resumes must be ruthlessly dense. NEVER suggest appending empty phrases like "demonstrating academic excellence", "showcasing problem-solving skills", or "demonstrating proficiency". Keep suggestions strictly technical and metric-driven.
-        3. DO NOT REWRITE FOR STYLE: If a bullet point already starts with a strong action verb and contains technical details, LEAVE IT ALONE. Do not rewrite "Architected..." to "Designed and implemented..." just to give feedback. 
-        4. DO NOT SUMMARIZE LISTS: If a candidate lists specific coursework or skills, do not suggest shortening or summarizing the list (e.g., do not suggest changing a list of 5 math courses into a summary of 3). 
-        5. FILTER REVIEWER NOISE: If the human reviewer's feedback is a single word or vague (e.g., "nice", "well written", "perfect"), IGNORE THAT SECTION ENTIRELY. Do not invent arbitrary feedback to fill space.
-        
-        FORMATTING RULES:
-        - DO NOT write any introduction, preamble, or commentary.
-        - Start DIRECTLY with the first section heading.
-        - Use markdown headings (###) for each section.
-        - Use bullet points (-) for individual suggestions.
-        - If providing a rewrite, use "**Before:**" and "**After:**" formatting.
-        
-        Candidate Profile/Track: ${re.profile}
-        Reviewer's Diagnostic Feedback:
-        ${commentsText}
-        ${domainGuidelines ? `\nDOMAIN-SPECIFIC GUIDELINES:\n${domainGuidelines}\n(Apply these strict domain guidelines when reviewing the CV!)\n` : ''}
-        ${cvText ? `Student's CV (raw text):\n${cvText.slice(0, 8000)}` : 'CV text is not available. Generate actionable suggestions based purely on the reviewer feedback above.'}
-        `
-
-        // Attempt Gemini First
-        if (geminiKeys.length > 0) {
-          console.log(`[LLM PROCESS] Initiating Gemini API with ${geminiKeys.length} keys`);
-          for (let i = 0; i < geminiKeys.length; i++) {
-            const currentIdx = (state.geminiIndex + i) % geminiKeys.length
-            const currentKey = geminiKeys[currentIdx]
-            try {
-              const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`
-              const geminiResponse = await fetch(geminiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: prompt }] }],
-                  generationConfig: { temperature: 0.0 }
-                })
-              })
-
-              if (geminiResponse.ok) {
-                const geminiData = await geminiResponse.json() as any
-                const content = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
-                if (content.trim()) {
-                  console.log(`[LLM PROCESS] Gemini API key index ${currentIdx} succeeded. Length: ${content.length}`);
-                  aiSuggestions = content
-                  
-                  // Update successful index in DB
-                  await prisma.systemState.update({
-                    where: { id: 'global' },
-                    data: { geminiIndex: (currentIdx + 1) % geminiKeys.length }
-                  })
-                  break;
-                }
-              } else {
-                console.error(`[LLM PROCESS ERROR] Gemini API key index ${currentIdx} failed status:`, geminiResponse.status)
-              }
-            } catch (err) {
-              console.error(`Error calling Gemini API with key index ${currentIdx}:`, err)
-            }
-          }
-        }
-
-        // Fallback to Groq
-        if (!aiSuggestions && groqKeys.length > 0) {
-          console.log(`[LLM PROCESS] Falling back to Groq API with ${groqKeys.length} keys`);
-          const groqUrl = 'https://api.groq.com/openai/v1/chat/completions'
-          for (let i = 0; i < groqKeys.length; i++) {
-            const currentIdx = (state.groqIndex + i) % groqKeys.length
-            const currentKey = groqKeys[currentIdx]
-            try {
-              const groqResponse = await fetch(groqUrl, {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${currentKey}`
-                },
-                body: JSON.stringify({
-                  model: groqModel,
-                  messages: [
-                    {
-                      role: 'system',
-                      content: 'You are an expert resume refiner. Provide direct, highly professional, actionable CV suggestions in clean markdown.'
-                    },
-                    {
-                      role: 'user',
-                      content: prompt
-                    }
-                  ],
-                  temperature: 0.0
-                })
-              })
-
-              if (groqResponse.ok) {
-                const groqData = await groqResponse.json() as any
-                const content = groqData.choices?.[0]?.message?.content || ''
-                if (content.trim()) {
-                  console.log(`[LLM PROCESS] Groq API key index ${currentIdx} succeeded. Length: ${content.length}`);
-                  aiSuggestions = content
-                  
-                  // Update successful index in DB
-                  await prisma.systemState.update({
-                    where: { id: 'global' },
-                    data: { groqIndex: (currentIdx + 1) % groqKeys.length }
-                  })
-                  break;
-                }
-              } else {
-                console.error(`[LLM PROCESS ERROR] Groq API key index ${currentIdx} failed status:`, groqResponse.status)
-              }
-            } catch (groqErr) {
-              console.error(`Error calling Groq API with key index ${currentIdx}:`, groqErr)
-            }
-          }
-        }
-
-        // Offline fallback suggestions if Groq keys fail
-        if (!aiSuggestions) {
-          aiSuggestions = `### AI CV Refinement Suggestions (Offline Fallback)
-  The AI assistant is temporarily busy or reached its request limit. Here is a summary of recommended actions based on the reviewer's feedback:
-  * **Address Reviewer Comments**: Focus on the specific items highlighted by the reviewer (e.g., improve structure, add domain-specific terminology).
-  * **Quantify Results**: Try to add metrics (percentages, numbers) to your project descriptions and work experience bullet points.
-  * **Format Consistency**: Ensure consistent margins, font sizes, and bullet styles throughout the document.`
-        }
-
         // Resolve reviewerId safely (especially if Admin)
         let reviewerId = payload.id
         if (payload.isAdmin) {
@@ -454,7 +280,7 @@
           where: { revieweeId },
           update: {
             comments,
-            aiSuggestions,
+            aiSuggestions: 'Processing AI suggestions...',
             reviewerId,
             editCount: { increment: 1 },
           },
@@ -462,7 +288,7 @@
             revieweeId,
             reviewerId,
             comments,
-            aiSuggestions,
+            aiSuggestions: 'Processing AI suggestions...',
             editCount: 1,
           },
         })
@@ -479,32 +305,219 @@
           })
         }
 
-        if (re.email) {
-          const labels = [
-            'Structure & Format',
-            'Relevance to Domain',
-            'Depth of Explanation',
-            'Language and Grammar',
-            'Improvements in Projects',
-            'Additional Suggestions',
-          ]
+        // Return immediately so the frontend UI doesn't hang
+        res.status(201).json(review)
 
-          const formattedComments = labels.map((label, idx) => 
-            `${label}: ${comments[idx]}`
-          )
+        // ==========================================
+        // START BACKGROUND AI PROCESSING AND EMAIL
+        // ==========================================
+        ;(async () => {
+          try {
+            // 1. Extract CV text from link using a Node.js extractor
+            let cvText = ''
+            if (re.cvLink) {
+              cvText = await extractTextFromLink(re.cvLink)
+            }
 
-          console.log(`[REVIEW CONTROLLER] Triggering sendReviewEmail to ${re.email}`);
-          sendReviewEmail({
-            to: re.email,
-            userName: re.name,
-            reviewComments: formattedComments,
-            aiSuggestions: aiSuggestions || undefined,
-          }).catch((mailErr) => {
-            console.error("[REVIEW CONTROLLER FAILSAFE ERROR] Error sending review email:", mailErr)
-          })
-        }
+            // 1.5 Load AI Spec Domain Guidelines based on profile
+            let domainGuidelines = ''
+            try {
+              if (re.profile) {
+                const mappedName = re.profile.replace(/[\/\\]/g, '').replace(/\s+/g, '') // e.g., "Product / FMCG" -> "ProductFMCG"
+                const specPath = path.join(__dirname, 'AI_Specs', `${mappedName}.md`)
+                if (fs.existsSync(specPath)) {
+                  domainGuidelines = fs.readFileSync(specPath, 'utf8')
+                  console.log(`[LLM PROCESS] Loaded AI Spec for profile ${re.profile}`)
+                } else {
+                  console.log(`[LLM PROCESS] No AI Spec found at ${specPath} for profile ${re.profile}`)
+                }
+              }
+            } catch (e) {
+              console.error('Could not load domain guidelines for profile:', re.profile, e)
+            }
 
-        return res.status(201).json(review)
+            // 2. Generate AI Suggestions using primary Gemini API, fallback to Groq
+            let aiSuggestions = ''
+            
+            const geminiKeysStr = process.env.GEMINI_API_KEYS || ''
+            const geminiKeys = geminiKeysStr.split(',').map(k => k.trim()).filter(Boolean)
+            const groqKeysStr = process.env.GROQ_API_KEYS || ''
+            const groqKeys = groqKeysStr.split(',').map(k => k.trim()).filter(Boolean)
+            const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
+
+            // Fetch API indices from Database
+            let state = await prisma.systemState.findUnique({ where: { id: 'global' } })
+            if (!state) {
+              state = await prisma.systemState.create({ data: { id: 'global' } })
+            }
+            
+            const labels = [
+              'Structure & Format',
+              'Relevance to Domain',
+              'Depth of Explanation',
+              'Language and Grammar',
+              'Improvements in Projects',
+              'Additional Suggestions',
+            ]
+            const commentsText = comments.map((c: string, i: number) => `${labels[i] || 'Feedback'}: ${c}`).join('\n')
+
+            const prompt = `
+            You are a ruthless, expert technical resume reviewer for engineering and quantitative placements at IIT Kharagpur. You are reviewing a 1-page technical CV.
+            
+            CRITICAL CONSTRAINTS — YOU WILL BE PENALIZED FOR VIOLATING THESE:
+            1. IGNORE TEXT PARSING ARTIFACTS: The provided CV text is machine-extracted. Table headers or columns may appear mashed together (e.g., "YearDegree/ExamInstituteCGPA/Marks"). DO NOT suggest formatting fixes for these obvious extraction artifacts.
+            2. ZERO HR FLUFF: KGP resumes must be ruthlessly dense. NEVER suggest appending empty phrases like "demonstrating academic excellence", "showcasing problem-solving skills", or "demonstrating proficiency". Keep suggestions strictly technical and metric-driven.
+            3. DO NOT REWRITE FOR STYLE: If a bullet point already starts with a strong action verb and contains technical details, LEAVE IT ALONE. Do not rewrite "Architected..." to "Designed and implemented..." just to give feedback. 
+            4. DO NOT SUMMARIZE LISTS: If a candidate lists specific coursework or skills, do not suggest shortening or summarizing the list (e.g., do not suggest changing a list of 5 math courses into a summary of 3). 
+            5. FILTER REVIEWER NOISE: If the human reviewer's feedback is a single word or vague (e.g., "nice", "well written", "perfect"), IGNORE THAT SECTION ENTIRELY. Do not invent arbitrary feedback to fill space.
+            
+            FORMATTING RULES:
+            - DO NOT write any introduction, preamble, or commentary.
+            - Start DIRECTLY with the first section heading.
+            - Use markdown headings (###) for each section.
+            - Use bullet points (-) for individual suggestions.
+            - If providing a rewrite, use "**Before:**" and "**After:**" formatting.
+            
+            Candidate Profile/Track: ${re.profile}
+            Reviewer's Diagnostic Feedback:
+            ${commentsText}
+            ${domainGuidelines ? `\nDOMAIN-SPECIFIC GUIDELINES:\n${domainGuidelines}\n(Apply these strict domain guidelines when reviewing the CV!)\n` : ''}
+            ${cvText ? `Student's CV (raw text):\n${cvText.slice(0, 8000)}` : 'CV text is not available. Generate actionable suggestions based purely on the reviewer feedback above.'}
+            `
+
+            // Attempt Gemini First
+            if (geminiKeys.length > 0) {
+              console.log(`[LLM PROCESS] Initiating Gemini API with ${geminiKeys.length} keys`);
+              for (let i = 0; i < geminiKeys.length; i++) {
+                const currentIdx = (state.geminiIndex + i) % geminiKeys.length
+                const currentKey = geminiKeys[currentIdx]
+                try {
+                  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`
+                  const geminiResponse = await fetch(geminiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      contents: [{ parts: [{ text: prompt }] }],
+                      generationConfig: { temperature: 0.0 }
+                    })
+                  })
+
+                  if (geminiResponse.ok) {
+                    const geminiData = await geminiResponse.json() as any
+                    const content = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
+                    if (content.trim()) {
+                      console.log(`[LLM PROCESS] Gemini API key index ${currentIdx} succeeded. Length: ${content.length}`);
+                      aiSuggestions = content
+                      
+                      // Update successful index in DB
+                      await prisma.systemState.update({
+                        where: { id: 'global' },
+                        data: { geminiIndex: (currentIdx + 1) % geminiKeys.length }
+                      })
+                      break;
+                    }
+                  } else {
+                    console.error(`[LLM PROCESS ERROR] Gemini API key index ${currentIdx} failed status:`, geminiResponse.status)
+                  }
+                } catch (err) {
+                  console.error(`Error calling Gemini API with key index ${currentIdx}:`, err)
+                }
+              }
+            }
+
+            // Fallback to Groq
+            if (!aiSuggestions && groqKeys.length > 0) {
+              console.log(`[LLM PROCESS] Falling back to Groq API with ${groqKeys.length} keys`);
+              const groqUrl = 'https://api.groq.com/openai/v1/chat/completions'
+              for (let i = 0; i < groqKeys.length; i++) {
+                const currentIdx = (state.groqIndex + i) % groqKeys.length
+                const currentKey = groqKeys[currentIdx]
+                try {
+                  const groqResponse = await fetch(groqUrl, {
+                    method: 'POST',
+                    headers: { 
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${currentKey}`
+                    },
+                    body: JSON.stringify({
+                      model: groqModel,
+                      messages: [
+                        {
+                          role: 'system',
+                          content: 'You are an expert resume refiner. Provide direct, highly professional, actionable CV suggestions in clean markdown.'
+                        },
+                        {
+                          role: 'user',
+                          content: prompt
+                        }
+                      ],
+                      temperature: 0.0
+                    })
+                  })
+
+                  if (groqResponse.ok) {
+                    const groqData = await groqResponse.json() as any
+                    const content = groqData.choices?.[0]?.message?.content || ''
+                    if (content.trim()) {
+                      console.log(`[LLM PROCESS] Groq API key index ${currentIdx} succeeded. Length: ${content.length}`);
+                      aiSuggestions = content
+                      
+                      // Update successful index in DB
+                      await prisma.systemState.update({
+                        where: { id: 'global' },
+                        data: { groqIndex: (currentIdx + 1) % groqKeys.length }
+                      })
+                      break;
+                    }
+                  } else {
+                    console.error(`[LLM PROCESS ERROR] Groq API key index ${currentIdx} failed status:`, groqResponse.status)
+                  }
+                } catch (groqErr) {
+                  console.error(`Error calling Groq API with key index ${currentIdx}:`, groqErr)
+                }
+              }
+            }
+
+            // Offline fallback suggestions if Groq keys fail
+            if (!aiSuggestions) {
+              aiSuggestions = `### AI CV Refinement Suggestions (Offline Fallback)\nThe AI assistant is temporarily busy or reached its request limit. Here is a summary of recommended actions based on the reviewer's feedback:\n* **Address Reviewer Comments**: Focus on the specific items highlighted by the reviewer (e.g., improve structure, add domain-specific terminology).\n* **Quantify Results**: Try to add metrics (percentages, numbers) to your project descriptions and work experience bullet points.\n* **Format Consistency**: Ensure consistent margins, font sizes, and bullet styles throughout the document.`
+            }
+
+            // Update the review with the AI Suggestions
+            await prisma.review.update({
+              where: { id: review.id },
+              data: { aiSuggestions },
+            })
+
+            // Send the email
+            if (re.email) {
+              const labels = [
+                'Structure & Format',
+                'Relevance to Domain',
+                'Depth of Explanation',
+                'Language and Grammar',
+                'Improvements in Projects',
+                'Additional Suggestions',
+              ]
+
+              const formattedComments = labels.map((label, idx) => 
+                `${label}: ${comments[idx]}`
+              )
+
+              console.log(`[REVIEW CONTROLLER] Triggering sendReviewEmail to ${re.email}`);
+              sendReviewEmail({
+                to: re.email,
+                userName: re.name,
+                reviewComments: formattedComments,
+                aiSuggestions: aiSuggestions || undefined,
+              }).catch((mailErr) => {
+                console.error("[REVIEW CONTROLLER FAILSAFE ERROR] Error sending review email:", mailErr)
+              })
+            }
+          } catch (bgErr) {
+            console.error("[BACKGROUND AI TASK ERROR]", bgErr)
+          }
+        })();
       } catch (err) {
         next(err)
       }
