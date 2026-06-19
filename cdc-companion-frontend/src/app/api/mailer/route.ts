@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 /**
  * Arguments for sending a review email
  */
-export interface ReviewEmailOptions {
+interface ReviewEmailOptions {
   to: string             // recipient email address
   userName: string       // recipient's name
   reviewComments: string[]  // array of feedback lines
@@ -314,7 +314,7 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
 /**
  * Send a CV review email.
  */
-export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void> {
+async function sendReviewEmail(options: ReviewEmailOptions): Promise<void> {
   const html = buildReviewEmail(options)
   
   console.log(`[MAILER] Preparing to send review email to: ${options.to} (Using ${smtpHost}:${smtpPort})`)
@@ -335,7 +335,7 @@ export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void
 /**
  * Send CV submission confirmation email with chosen password
  */
-export async function sendRegistrationEmail(to: string, userName: string, password: string, cvLink: string, profile: string): Promise<void> {
+async function sendRegistrationEmail(to: string, userName: string, password: string, cvLink: string, profile: string): Promise<void> {
   const html = `
   <!DOCTYPE html>
   <html lang="en">
