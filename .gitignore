@@ -1,5 +1,6 @@
 .env
 */.env
-/cv_skills/
+cv_skills/exports/
+cv_skills/extracted_cvs/*.txt
 
 
