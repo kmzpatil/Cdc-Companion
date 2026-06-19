@@ -24,9 +24,21 @@ class ReviewerController {
                 if (!name || !rollNo || !email || !profiles || !reviewsNumber) {
                     return res.status(400).json({ error: 'Missing required fields' });
                 }
-                const existing = yield prisma_1.default.reviewer.findUnique({ where: { name } });
+                const existing = yield prisma_1.default.reviewer.findFirst({
+                    where: {
+                        OR: [
+                            { password: rollNo },
+                            { email }
+                        ]
+                    }
+                });
                 if (existing) {
-                    return res.status(400).json({ error: 'A reviewer with this name already exists' });
+                    if (existing.password === rollNo) {
+                        return res.status(400).json({ error: 'A reviewer with this roll number already exists' });
+                    }
+                    if (existing.email === email) {
+                        return res.status(400).json({ error: 'A reviewer with this email already exists' });
+                    }
                 }
                 // Roll Number acts as the password since it has the seniority year prefix (e.g. 21CS10001 starting with '21')
                 const reviewer = yield prisma_1.default.reviewer.create({
@@ -57,8 +69,11 @@ class ReviewerController {
     login(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name, password } = req.body;
-                const reviewer = yield prisma_1.default.reviewer.findUnique({ where: { name } });
+                const { email, password } = req.body;
+                if (!email || !password) {
+                    return res.status(400).json({ error: 'Missing email or password' });
+                }
+                const reviewer = yield prisma_1.default.reviewer.findUnique({ where: { email } });
                 if (!reviewer || reviewer.password !== password) {
                     return res.status(401).json({ error: 'Invalid credentials' });
                 }
@@ -89,11 +104,10 @@ class ReviewerController {
     getNextCV(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const auth = req.headers.authorization;
-                if (!(auth === null || auth === void 0 ? void 0 : auth.startsWith('Bearer '))) {
-                    return res.status(401).json({ error: 'Missing token' });
+                const payload = req.user;
+                if (!payload) {
+                    return res.status(401).json({ error: 'Unauthenticated' });
                 }
-                const payload = jsonwebtoken_1.default.verify(auth.slice(7), process.env.JWT_SECRET);
                 const reviewer = yield prisma_1.default.reviewer.findUnique({ where: { id: payload.id } });
                 if (!reviewer) {
                     return res.status(404).json({ error: 'Reviewer not found' });
@@ -126,15 +140,18 @@ class ReviewerController {
     submitReview(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const auth = req.headers.authorization;
-                if (!(auth === null || auth === void 0 ? void 0 : auth.startsWith('Bearer '))) {
-                    return res.status(401).json({ error: 'Missing token' });
+                const payload = req.user;
+                if (!payload) {
+                    return res.status(401).json({ error: 'Unauthenticated' });
                 }
-                const payload = jsonwebtoken_1.default.verify(auth.slice(7), process.env.JWT_SECRET);
                 const { revieweeId, comments } = req.body;
                 if (!Array.isArray(comments)) {
                     return res.status(400).json({ error: 'Comments must be an array' });
                 }
+                // Check if a review already exists to prevent duplicate reviewer count increments
+                const existingReview = yield prisma_1.default.review.findUnique({
+                    where: { revieweeId }
+                });
                 const review = yield prisma_1.default.review.upsert({
                     where: { revieweeId },
                     update: {
@@ -151,10 +168,12 @@ class ReviewerController {
                     where: { id: revieweeId },
                     data: { status: true, submittedAt: new Date() },
                 });
-                yield prisma_1.default.reviewer.update({
-                    where: { id: payload.id },
-                    data: { reviewedCount: { increment: 1 } },
-                });
+                if (!existingReview) {
+                    yield prisma_1.default.reviewer.update({
+                        where: { id: payload.id },
+                        data: { reviewedCount: { increment: 1 } },
+                    });
+                }
                 const re = yield prisma_1.default.reviewee.findUnique({
                     where: { id: revieweeId },
                     select: { email: true, name: true },
@@ -204,11 +223,10 @@ class ReviewerController {
     getAssignedCVs(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const auth = req.headers.authorization;
-                if (!(auth === null || auth === void 0 ? void 0 : auth.startsWith('Bearer '))) {
-                    return res.status(401).json({ error: 'Missing token' });
+                const payload = req.user;
+                if (!payload) {
+                    return res.status(401).json({ error: 'Unauthenticated' });
                 }
-                const payload = jsonwebtoken_1.default.verify(auth.slice(7), process.env.JWT_SECRET);
                 // fetch reviewer details
                 const reviewer = yield prisma_1.default.reviewer.findUnique({
                     where: { id: payload.id },

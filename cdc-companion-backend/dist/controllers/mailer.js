@@ -16,7 +16,6 @@ exports.sendReviewEmail = sendReviewEmail;
 exports.sendRegistrationEmail = sendRegistrationEmail;
 // src/mailer.ts
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const path_1 = __importDefault(require("path"));
 // 1. Create transporter
 const transporter = nodemailer_1.default.createTransport({
     host: process.env.SMTP_HOST,
@@ -283,27 +282,12 @@ function buildReviewEmail(opts) {
       
       <div class="divider"></div>
       
-      <!-- Call to Action -->
-      <div class="cta-section">
-        <div class="cta-text">
-          Ready to take your career to the next level?
-        </div>
-        <a href="https://prepnest.in/?refercode=PrepGrow-sahib-singhprepgrowthpartner-02" class="cta-button">
-          Explore PrepNest Services
-        </a>
-      </div>
-      
-      <!-- Logo Section -->
-      <div class="logo-section">
-        <img src="cid:prepnestImage" alt="PrepNest Logo" class="logo-section-img">
-      </div>
     </div>
     
     <!-- Footer -->
     <div class="footer">
-      <div class="footer-brand">PrepNest</div>
-      <div class="footer-tagline">Simplifying your job journey</div>
-      <a href="https://www.prepnest.in" class="footer-website">www.prepnest.in</a>
+      <div class="footer-brand">Communiqué</div>
+      <div class="footer-tagline">IIT Kharagpur Placement & Internship Preparation Companion</div>
     </div>
   </div>
 </body>
@@ -311,7 +295,7 @@ function buildReviewEmail(opts) {
   `;
 }
 /**
- * Send a CV review email with embedded PrepNest image.
+ * Send a CV review email.
  */
 function sendReviewEmail(options) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -321,13 +305,6 @@ function sendReviewEmail(options) {
             to: options.to,
             subject: '🎉 Your CV Review is Ready!',
             html,
-            attachments: [
-                {
-                    filename: 'prepnest.jpg',
-                    path: path_1.default.resolve(__dirname, '../../assets/prepnest.jpg'),
-                    cid: 'prepnestImage',
-                },
-            ],
         });
     });
 }
@@ -342,7 +319,7 @@ function sendRegistrationEmail(to, userName, password, cvLink, profile) {
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Submission Confirmed - PrepNest</title>
+    <title>CV Submission Confirmed - CDC Companion</title>
     <style>
       body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -427,7 +404,7 @@ function sendRegistrationEmail(to, userName, password, cvLink, profile) {
       </p>
 
       <div class="footer">
-        <p>PrepNest • Simplifying your job journey</p>
+        <p>Communiqué • IIT Kharagpur Placement & Internship Preparation Companion</p>
       </div>
     </div>
   </body>

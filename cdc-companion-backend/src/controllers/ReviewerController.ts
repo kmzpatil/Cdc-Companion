@@ -21,9 +21,21 @@ export default class ReviewerController {
         return res.status(400).json({ error: 'Missing required fields' })
       }
 
-      const existing = await prisma.reviewer.findUnique({ where: { name } })
+      const existing = await prisma.reviewer.findFirst({
+        where: {
+          OR: [
+            { password: rollNo },
+            { email }
+          ]
+        }
+      })
       if (existing) {
-        return res.status(400).json({ error: 'A reviewer with this name already exists' })
+        if (existing.password === rollNo) {
+          return res.status(400).json({ error: 'A reviewer with this roll number already exists' })
+        }
+        if (existing.email === email) {
+          return res.status(400).json({ error: 'A reviewer with this email already exists' })
+        }
       }
 
       // Roll Number acts as the password since it has the seniority year prefix (e.g. 21CS10001 starting with '21')
@@ -54,8 +66,11 @@ export default class ReviewerController {
   // POST /api/reviewer/login
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, password } = req.body
-      const reviewer = await prisma.reviewer.findUnique({ where: { name } })
+      const { email, password } = req.body
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Missing email or password' })
+      }
+      const reviewer = await prisma.reviewer.findUnique({ where: { email } })
       if (!reviewer || reviewer.password !== password) {
         return res.status(401).json({ error: 'Invalid credentials' })
       }
@@ -87,11 +102,10 @@ export default class ReviewerController {
   // GET /api/reviewer/next
   async getNextCV(req: Request, res: Response, next: NextFunction) {
     try {
-      const auth = req.headers.authorization
-      if (!auth?.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing token' })
+      const payload = req.user
+      if (!payload) {
+        return res.status(401).json({ error: 'Unauthenticated' })
       }
-      const payload = jwt.verify(auth.slice(7), process.env.JWT_SECRET!) as JwtPayload
 
       const reviewer = await prisma.reviewer.findUnique({ where: { id: payload.id } })
       if (!reviewer) {
@@ -128,16 +142,20 @@ export default class ReviewerController {
   // POST /api/reviewer/review
   async submitReview(req: Request, res: Response, next: NextFunction) {
     try {
-      const auth = req.headers.authorization
-      if (!auth?.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing token' })
+      const payload = req.user
+      if (!payload) {
+        return res.status(401).json({ error: 'Unauthenticated' })
       }
-      const payload = jwt.verify(auth.slice(7), process.env.JWT_SECRET!) as JwtPayload
 
       const { revieweeId, comments } = req.body
       if (!Array.isArray(comments)) {
         return res.status(400).json({ error: 'Comments must be an array' })
       }
+
+      // Check if a review already exists to prevent duplicate reviewer count increments
+      const existingReview = await prisma.review.findUnique({
+        where: { revieweeId }
+      })
 
       const review = await prisma.review.upsert({
         where: { revieweeId },
@@ -156,10 +174,13 @@ export default class ReviewerController {
         where: { id: revieweeId },
         data: { status: true, submittedAt: new Date() },
       })
-      await prisma.reviewer.update({
-        where: { id: payload.id },
-        data: { reviewedCount: { increment: 1 } },
-      })
+
+      if (!existingReview) {
+        await prisma.reviewer.update({
+          where: { id: payload.id },
+          data: { reviewedCount: { increment: 1 } },
+        })
+      }
 
       const re = await prisma.reviewee.findUnique({
         where: { id: revieweeId },
@@ -218,11 +239,10 @@ sendReviewEmail({
   // GET /api/reviewer/assigned
   async getAssignedCVs(req: Request, res: Response, next: NextFunction) {
     try {
-      const auth = req.headers.authorization
-      if (!auth?.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing token' })
+      const payload = req.user
+      if (!payload) {
+        return res.status(401).json({ error: 'Unauthenticated' })
       }
-      const payload = jwt.verify(auth.slice(7), process.env.JWT_SECRET!) as JwtPayload
 
       // fetch reviewer details
       const reviewer = await prisma.reviewer.findUnique({

@@ -40,12 +40,12 @@ model Admin {
 /// A reviewer, who may work across multiple profiles
 model Reviewer {
   id            Int        @id @default(autoincrement())
-  name          String     @unique
+  name          String
   password      String
   profiles      String[]  @default([])
   reviewsNumber      Int        // how many CVs they can handle
   reviewedCount Int        @default(0)
-  email         String?
+  email         String     @unique
   admin         Boolean    @default(false)
 
   assignedCVs   Reviewee[] 

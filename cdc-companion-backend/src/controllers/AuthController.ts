@@ -16,12 +16,12 @@ export default class AuthController {
    */
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, password } = req.body
-      if (!name || !password) {
-        return res.status(400).json({ error: 'Missing name or password' })
+      const { email, password } = req.body
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Missing email or password' })
       }
 
-      const user = await prisma.reviewer.findUnique({ where: { name } })
+      const user = await prisma.reviewer.findUnique({ where: { email } })
       if (!user || user.password !== password) {
         return res.status(401).json({ error: 'Invalid credentials' })
       }

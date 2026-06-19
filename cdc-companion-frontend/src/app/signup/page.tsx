@@ -109,7 +109,7 @@ export default function ReviewerSignupPage() {
           </p>
           <div className="rounded-2xl border border-border bg-surface-strong p-6 mb-6 text-left space-y-2">
             <h3 className="font-bold text-[#1b2126]">Your Login Details:</h3>
-            <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Full Name:</strong> {formData.name}</p>
+            <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Email Address:</strong> {formData.email}</p>
             <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Password:</strong> {formData.rollNo.toUpperCase()} (Your Roll Number)</p>
           </div>
           <Link href="/login" className="pill-btn pill-btn-primary px-8">

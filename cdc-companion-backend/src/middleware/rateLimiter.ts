@@ -12,6 +12,15 @@ export function rateLimiter(windowMs: number, maxRequests: number) {
     const ip = req.ip || req.socket.remoteAddress || 'unknown-ip'
     const now = Date.now()
 
+    // Cleanup expired entries to prevent memory leak
+    if (ipRequestCounts.size > 5000) {
+      for (const [key, val] of ipRequestCounts.entries()) {
+        if (now > val.resetTime) {
+          ipRequestCounts.delete(key)
+        }
+      }
+    }
+
     let record = ipRequestCounts.get(ip)
 
     if (!record || now > record.resetTime) {

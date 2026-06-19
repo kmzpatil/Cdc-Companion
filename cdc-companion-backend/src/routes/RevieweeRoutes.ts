@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 // Make sure the file exists at the correct path and with the correct casing
 import RevieweeController from "../controllers/RevieweeController";
+import { auth } from "../middleware/auth";
 
 const revieweeController = new RevieweeController();
 
@@ -21,6 +22,7 @@ router.post("/check",
 
 
 router.get("/submission/:email",
+    auth(false),
     (req: Request, res: Response, next: NextFunction) => {
         revieweeController.getSubmission(req, res, next).catch(next);
     }

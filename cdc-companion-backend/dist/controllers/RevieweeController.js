@@ -29,6 +29,23 @@ class RevieweeController {
                 if (!cvLink.includes('drive.google.com') && !cvLink.includes('docs.google.com')) {
                     return res.status(400).json({ error: 'Please submit a valid Google Drive or Google Docs link.' });
                 }
+                // Check for duplicate rollNo or email
+                const existing = yield prisma_1.default.reviewee.findFirst({
+                    where: {
+                        OR: [
+                            { rollNo },
+                            { email }
+                        ]
+                    }
+                });
+                if (existing) {
+                    if (existing.rollNo === rollNo) {
+                        return res.status(400).json({ error: 'Roll number already registered' });
+                    }
+                    if (existing.email === email) {
+                        return res.status(400).json({ error: 'Email address already registered' });
+                    }
+                }
                 const reviewee = yield prisma_1.default.reviewee.create({
                     data: {
                         name,

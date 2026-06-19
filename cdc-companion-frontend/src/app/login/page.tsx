@@ -8,7 +8,7 @@ import { BACKEND_URL } from '@/constants/apiConstants'
 
 export default function ReviewerLoginPage() {
   const router = useRouter()
-  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +23,7 @@ export default function ReviewerLoginPage() {
       const res = await fetch(`${BACKEND_URL}/api/reviewer/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password }),
+        body: JSON.stringify({ email, password }),
       })
 
       const data = await res.json()
@@ -87,20 +87,20 @@ export default function ReviewerLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div>
-            <label htmlFor="reviewerName" className="mb-2 block text-sm font-semibold text-[#1b2126]">
-              Full Name
+            <label htmlFor="reviewerEmail" className="mb-2 block text-sm font-semibold text-[#1b2126]">
+              Institute Email
             </label>
             <input
-              id="reviewerName"
-              name="name"
-              autoComplete="name"
+              id="reviewerEmail"
+              name="email"
+              autoComplete="email"
               spellCheck={false}
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="field"
-              placeholder="Enter your full name"
+              placeholder="Enter your institute email"
             />
           </div>
 

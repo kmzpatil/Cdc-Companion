@@ -27,11 +27,11 @@ class AuthController {
     login(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name, password } = req.body;
-                if (!name || !password) {
-                    return res.status(400).json({ error: 'Missing name or password' });
+                const { email, password } = req.body;
+                if (!email || !password) {
+                    return res.status(400).json({ error: 'Missing email or password' });
                 }
-                const user = yield prisma_1.default.reviewer.findUnique({ where: { name } });
+                const user = yield prisma_1.default.reviewer.findUnique({ where: { email } });
                 if (!user || user.password !== password) {
                     return res.status(401).json({ error: 'Invalid credentials' });
                 }
