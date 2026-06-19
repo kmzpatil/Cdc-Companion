@@ -13,10 +13,11 @@ export interface ReviewEmailOptions {
 }
 
 // 1. Create transporter
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),  // e.g. 587
-  secure: false,                        // STARTTLS (port 587)
+  port: smtpPort,
+  secure: smtpPort === 465, // true for port 465, false for 587 (STARTTLS)
   auth: {
     user: process.env.SMTP_USER!,
     pass: process.env.SMTP_PASS!,
