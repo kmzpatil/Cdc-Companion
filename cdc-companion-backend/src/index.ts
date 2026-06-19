@@ -23,6 +23,11 @@ app.use('/api/reviewee', revieweeRoutes)
 app.use('/api/reviewer', reviewerRoutes)
 app.use('/api/admin',    adminRoutes)
 
+// Ping endpoint to keep the server alive on platforms like Render
+app.get('/api/ping', (req: Request, res: Response) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
 interface ErrorWithStatus extends Error {
     status?: number
 }

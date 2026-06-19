@@ -110,7 +110,7 @@ export default function ReviewerSignupPage() {
           </p>
           <div className="rounded-2xl border border-border bg-surface-strong p-6 mb-6 text-left space-y-2">
             <h3 className="font-bold text-[#1b2126]">Your Login Details:</h3>
-            <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Email Address:</strong> {formData.email}</p>
+            <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Institute Email ID:</strong> {formData.email}</p>
             <p className="text-sm text-[#4f5964]"><strong className="text-[#1b2126]">Password:</strong> {formData.rollNo.toUpperCase()} (Your Roll Number)</p>
           </div>
           <Link href="/login" className="pill-btn pill-btn-primary px-8">
@@ -202,7 +202,7 @@ export default function ReviewerSignupPage() {
 
               <div>
                 <label htmlFor="email" className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
-                  Email Address *
+                  Institute Email ID *
                 </label>
                 <div className="relative">
                   <input
@@ -213,7 +213,7 @@ export default function ReviewerSignupPage() {
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     required
                     className="field"
-                    placeholder="example@gmail.com"
+                    placeholder="example@kgpian.iitkgp.ac.in"
                   />
                 </div>
               </div>
