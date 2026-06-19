@@ -1,6 +1,6 @@
 // src/mailer.ts
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';import path from 'path'
+import nodemailer from 'nodemailer';
 
 /**
  * Arguments for sending a review email
