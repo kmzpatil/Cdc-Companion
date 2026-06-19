@@ -57,6 +57,13 @@ router.delete(
   }
 )
 
+router.delete(
+  '/review/:id',
+  (req: Request, res: Response, next: NextFunction) => {
+    ctrl.deleteReview(req, res, next).catch(next)
+  }
+)
+
 router.post(
   '/reassign',
   (req: Request, res: Response, next: NextFunction) => {

@@ -110,6 +110,7 @@ export default class RevieweeController {
         result.feedback = {
           id: submission.review.id,
           comments: submission.review.comments,
+          aiSuggestions: submission.review.aiSuggestions,
           submissionTime: submission.review.createdAt,
           reviewer: {
             name: submission.review.reviewer.name,
@@ -164,6 +165,7 @@ export default class RevieweeController {
         result.feedback = {
           id: submission.review.id,
           comments: submission.review.comments,
+          aiSuggestions: submission.review.aiSuggestions,
           submissionTime: submission.review.createdAt,
           reviewer: {
             name: submission.review.reviewer.name,

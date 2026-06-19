@@ -197,13 +197,22 @@ class AdminController {
                 const id = parseInt(req.params.id, 10);
                 const review = yield prisma_1.default.review.findUnique({
                     where: { id },
-                    select: { revieweeId: true }
+                    select: { revieweeId: true, reviewerId: true }
                 });
                 if (review) {
+                    // Reset reviewee status
                     yield prisma_1.default.reviewee.update({
                         where: { id: review.revieweeId },
                         data: { status: false }
                     });
+                    // Decrement reviewer count
+                    const reviewer = yield prisma_1.default.reviewer.findUnique({ where: { id: review.reviewerId } });
+                    if (reviewer && reviewer.reviewedCount > 0) {
+                        yield prisma_1.default.reviewer.update({
+                            where: { id: review.reviewerId },
+                            data: { reviewedCount: { decrement: 1 } }
+                        });
+                    }
                 }
                 yield prisma_1.default.review.delete({ where: { id } });
                 return res.json({ message: 'Review deleted successfully' });

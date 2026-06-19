@@ -9,6 +9,7 @@ export interface ReviewEmailOptions {
   to: string             // recipient email address
   userName: string       // recipient's name
   reviewComments: string[]  // array of feedback lines
+  aiSuggestions?: string  // AI recommendations
 }
 
 // 1. Create transporter
@@ -26,7 +27,7 @@ const transporter = nodemailer.createTransport({
  * Build HTML for the review email, using a modern purple theme.
  */
 function buildReviewEmail(opts: ReviewEmailOptions): string {
-  const { userName, reviewComments } = opts
+  const { userName, reviewComments, aiSuggestions } = opts
   
   return `
 <!DOCTYPE html>
@@ -276,6 +277,18 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
           ${reviewComments.map(comment => `<li>${comment}</li>`).join('')}
         </ul>
       </div>
+
+      ${aiSuggestions ? `
+      <!-- AI Recommendations Section -->
+      <div class="review-section" style="border-left-color: #10b981; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);">
+        <div class="review-title" style="color: #047857; font-weight: 700;">
+          ✨ AI CV Refinement Suggestions
+        </div>
+        <div style="font-size: 14px; line-height: 1.6; color: #1f2937; background: white; padding: 16px; border-radius: 8px; border-left: 3px solid #10b981; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); font-family: sans-serif;">
+          ${parseMarkdownToHtml(aiSuggestions)}
+        </div>
+      </div>
+      ` : ''}
       
       <div class="divider"></div>
       
@@ -415,3 +428,87 @@ export async function sendRegistrationEmail(to: string, userName: string, passwo
     html,
   })
 }
+
+function parseMarkdownToHtml(markdown: string): string {
+  if (!markdown) return '';
+  
+  const lines = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const output: string[] = [];
+  let inList = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Headings
+    if (trimmed.startsWith('#### ')) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      const content = trimmed.substring(5).trim();
+      output.push(`<h5 style="margin-top:12px;margin-bottom:4px;font-size:13px;color:#047857;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(content)}</h5>`);
+      continue;
+    }
+    if (trimmed.startsWith('### ')) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      const content = trimmed.substring(4).trim();
+      output.push(`<h4 style="margin-top:16px;margin-bottom:6px;font-size:15px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h4>`);
+      continue;
+    }
+    if (trimmed.startsWith('## ')) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      const content = trimmed.substring(3).trim();
+      output.push(`<h3 style="margin-top:20px;margin-bottom:8px;font-size:17px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h3>`);
+      continue;
+    }
+    if (trimmed.startsWith('# ')) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      const content = trimmed.substring(2).trim();
+      output.push(`<h2 style="margin-top:24px;margin-bottom:10px;font-size:19px;color:#1e293b;font-weight:700;">${escapeHtml(content)}</h2>`);
+      continue;
+    }
+
+    // Bullet points — group into <ul>
+    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+      if (!inList) {
+        output.push('<ul style="margin:8px 0;padding-left:20px;">');
+        inList = true;
+      }
+      const content = trimmed.substring(2).trim();
+      output.push(`<li style="font-size:14px;color:#475569;margin-bottom:4px;line-height:1.6;">${parseInlineMarkdown(content)}</li>`);
+      continue;
+    }
+
+    // Empty line — close list if open, add small spacer only between content blocks
+    if (trimmed === '') {
+      if (inList) { output.push('</ul>'); inList = false; }
+      const last = output[output.length - 1] || '';
+      if (last && !last.startsWith('<div style="height:') && !last.startsWith('</ul>') && !last.match(/^<h[2-5]/)) {
+        output.push('<div style="height:6px;"></div>');
+      }
+      continue;
+    }
+
+    // Normal paragraph text
+    if (inList) { output.push('</ul>'); inList = false; }
+    const parsed = parseInlineMarkdown(trimmed);
+    output.push(`<p style="font-size:14px;color:#475569;margin:0 0 6px 0;line-height:1.6;">${parsed}</p>`);
+  }
+
+  if (inList) output.push('</ul>');
+  return output.join('\n');
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function parseInlineMarkdown(text: string): string {
+  let escaped = escapeHtml(text);
+  // Bold: **text**
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:700;color:#0f172a;">$1</strong>');
+  // Italic: *text*
+  escaped = escaped.replace(/\*(.*?)\*/g, '<em style="font-style:italic;">$1</em>');
+  return escaped;
+}

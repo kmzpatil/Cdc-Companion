@@ -30,7 +30,7 @@ const transporter = nodemailer_1.default.createTransport({
  * Build HTML for the review email, using a modern purple theme.
  */
 function buildReviewEmail(opts) {
-    const { userName, reviewComments } = opts;
+    const { userName, reviewComments, aiSuggestions } = opts;
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -279,6 +279,18 @@ function buildReviewEmail(opts) {
           ${reviewComments.map(comment => `<li>${comment}</li>`).join('')}
         </ul>
       </div>
+
+      ${aiSuggestions ? `
+      <!-- AI Recommendations Section -->
+      <div class="review-section" style="border-left-color: #10b981; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);">
+        <div class="review-title" style="color: #047857; font-weight: 700;">
+          ✨ AI CV Refinement Suggestions
+        </div>
+        <div style="font-size: 14px; line-height: 1.6; color: #1f2937; background: white; padding: 16px; border-radius: 8px; border-left: 3px solid #10b981; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); font-family: sans-serif;">
+          ${parseMarkdownToHtml(aiSuggestions)}
+        </div>
+      </div>
+      ` : ''}
       
       <div class="divider"></div>
       
@@ -417,4 +429,46 @@ function sendRegistrationEmail(to, userName, password, cvLink, profile) {
             html,
         });
     });
+}
+function parseMarkdownToHtml(markdown) {
+    if (!markdown)
+        return '';
+    const lines = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    const processedLines = lines.map(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('#### ')) {
+            const content = trimmed.substring(5).trim();
+            return `<h5 style="margin-top: 10px; margin-bottom: 5px; font-size: 13px; color: #047857; font-weight: 700;">${escapeHtml(content)}</h5>`;
+        }
+        if (trimmed.startsWith('### ')) {
+            const content = trimmed.substring(4).trim();
+            return `<h4 style="margin-top: 15px; margin-bottom: 8px; font-size: 15px; color: #1e293b; font-weight: 700;">${escapeHtml(content)}</h4>`;
+        }
+        if (trimmed.startsWith('## ')) {
+            const content = trimmed.substring(3).trim();
+            return `<h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 17px; color: #1e293b; font-weight: 700;">${escapeHtml(content)}</h3>`;
+        }
+        if (trimmed.startsWith('# ')) {
+            const content = trimmed.substring(2).trim();
+            return `<h2 style="margin-top: 25px; margin-bottom: 12px; font-size: 19px; color: #1e293b; font-weight: 700;">${escapeHtml(content)}</h2>`;
+        }
+        if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+            const content = trimmed.substring(2).trim();
+            const parsedContent = parseInlineMarkdown(content);
+            return `<li style="margin-left: 20px; font-size: 14px; color: #475569; margin-bottom: 4px;">${parsedContent}</li>`;
+        }
+        return parseInlineMarkdown(line);
+    });
+    return processedLines.join('<br/>');
+}
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+function parseInlineMarkdown(text) {
+    let escaped = escapeHtml(text);
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700; color: #0f172a;">$1</strong>');
+    return escaped;
 }

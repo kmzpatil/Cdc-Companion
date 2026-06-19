@@ -5,8 +5,9 @@ import prisma from '../prisma'
 
 function normalizeProfile(p: string): string {
   const upper = p.toUpperCase().replace(/\s+/g, '').replace(/[-_\/]/g, '');
-  if (upper === 'SOFTWARE' || upper === 'SDE' || upper === 'SDEQUANT') return 'SOFTWARE';
-  if (upper === 'FINANCEQUANT' || upper === 'FINANCE') return 'FINANCE_QUANT';
+  if (upper === 'SOFTWARE' || upper === 'SDE') return 'SOFTWARE';
+  if (upper === 'FINANCE') return 'FINANCE';
+  if (upper === 'QUANT') return 'QUANT';
   if (upper === 'PRODUCTFMCG' || upper === 'FMCG') return 'PRODUCT_FMCG';
   return upper;
 }
@@ -98,54 +99,72 @@ async allocate(req: Request, res: Response, next: NextFunction) {
     const pending = await prisma.reviewee.findMany({
       where: { assignedToId: null },
     });
+
     if (!pending.length) {
       return res.json({ message: 'No CVs to allocate' });
     }
 
-    // fetch reviewers with their current assignments
-    const reviewers = await prisma.reviewer.findMany({
+    // 1. PRE-PROCESS AND SORT CVs
+    // Sort ascending by rollPrefix: 23-batch CVs get processed BEFORE 24-batch CVs.
+    const pendingOptimized = pending
+      .map(cv => ({
+        ...cv,
+        rollPrefix: parseInt(cv.rollNo.slice(0, 2), 10),
+        normProfile: normalizeProfile(cv.profile) // cache this to save CPU
+      }))
+      .sort((a, b) => a.rollPrefix - b.rollPrefix); 
+
+    const rawReviewers = await prisma.reviewer.findMany({
       include: { assignedCVs: true },
     });
 
-    for (const cv of pending) {
-      const rollPrefix = parseInt(cv.rollNo.slice(0, 2), 10);
+    // Pre-compute reviewer prefixes and profiles to avoid doing it inside the loop
+    const reviewers = rawReviewers.map(r => ({
+      ...r,
+      pwdPrefix: parseInt(r.password.slice(0, 2), 10),
+      normProfiles: r.profiles.map(normalizeProfile)
+    }));
 
+    for (const cv of pendingOptimized) {
       const eligible = reviewers
         .filter(r => {
-          const pwdPrefix = parseInt(r.password.slice(0, 2), 10);
-
           return (
-            // handles this profile (case-insensitive and format-insensitive check)
-            r.profiles.map(normalizeProfile).includes(normalizeProfile(cv.profile)) &&
-            // hasn't reviewed up to their quota
-            r.reviewedCount < r.reviewsNumber &&
-            // doesn't already have too many CVs assigned
-            r.assignedCVs.length < r.reviewsNumber &&
-            // password-prefix rule (less-than-or-equal-to so same-batch peer reviews are permitted)
-            pwdPrefix <= rollPrefix
+            r.normProfiles.includes(cv.normProfile) && // Format-insensitive profile check
+            r.assignedCVs.length < r.reviewsNumber &&  // Hasn't hit quota
+            r.pwdPrefix < cv.rollPrefix                // Strict seniority rule
           );
         })
-        .sort((a, b) => a.reviewedCount - b.reviewedCount);
+        .sort((a, b) => {
+          // Primary Sort: Load balancing (whoever has fewer assigned CVs)
+          if (a.assignedCVs.length !== b.assignedCVs.length) {
+            return a.assignedCVs.length - b.assignedCVs.length;
+          }
+          
+          // Secondary Sort: Conserve your super-seniors!
+          // If a 23-batch and a 22-batch reviewer have the exact same workload, 
+          // we want the 23-batch reviewer to take it (higher prefix number = less senior).
+          return b.pwdPrefix - a.pwdPrefix; 
+        });
 
       if (!eligible.length) continue;
 
       const chosen = eligible[0];
 
-      // assign in DB
+      // Assign in DB
       await prisma.reviewee.update({
         where: { id: cv.id },
         data: { assignedToId: chosen.id },
       });
 
-      // bump their reviewedCount
+      // Bump their reviewedCount
       await prisma.reviewer.update({
         where: { id: chosen.id },
         data: { reviewedCount: { increment: 1 } },
       });
 
-      // keep in-memory state in sync
+      // Keep in-memory state in sync so the loop correctly evaluates the next CV
       chosen.reviewedCount++;
-      chosen.assignedCVs.push(cv);
+      chosen.assignedCVs.push(cv as any); // Cast slightly depending on your Prisma types
     }
 
     return res.json({ message: 'Allocation complete' });
@@ -188,13 +207,22 @@ async allocate(req: Request, res: Response, next: NextFunction) {
       const id = parseInt(req.params.id, 10)
       const review = await prisma.review.findUnique({
         where: { id },
-        select: { revieweeId: true }
+        select: { revieweeId: true, reviewerId: true }
       })
       if (review) {
+        // Reset reviewee status
         await prisma.reviewee.update({
           where: { id: review.revieweeId },
           data: { status: false }
         })
+        // Decrement reviewer count
+        const reviewer = await prisma.reviewer.findUnique({ where: { id: review.reviewerId } })
+        if (reviewer && reviewer.reviewedCount > 0) {
+          await prisma.reviewer.update({
+            where: { id: review.reviewerId },
+            data: { reviewedCount: { decrement: 1 } }
+          })
+        }
       }
       await prisma.review.delete({ where: { id } })
       return res.json({ message: 'Review deleted successfully' })

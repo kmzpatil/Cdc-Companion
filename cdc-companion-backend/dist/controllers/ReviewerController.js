@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mailer_1 = require("./mailer");
 const prisma_1 = __importDefault(require("../prisma"));
+const child_process_1 = require("child_process");
+const path_1 = __importDefault(require("path"));
 class ReviewerController {
     // POST /api/reviewer/signup
     signup(req, res, next) {
@@ -139,6 +141,7 @@ class ReviewerController {
     // POST /api/reviewer/review
     submitReview(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
             try {
                 const payload = req.user;
                 if (!payload) {
@@ -148,44 +151,40 @@ class ReviewerController {
                 if (!Array.isArray(comments)) {
                     return res.status(400).json({ error: 'Comments must be an array' });
                 }
+                const re = yield prisma_1.default.reviewee.findUnique({
+                    where: { id: revieweeId },
+                    select: { email: true, name: true, cvLink: true, profile: true },
+                });
+                if (!re) {
+                    return res.status(404).json({ error: 'Reviewee not found' });
+                }
                 // Check if a review already exists to prevent duplicate reviewer count increments
                 const existingReview = yield prisma_1.default.review.findUnique({
                     where: { revieweeId }
                 });
-                const review = yield prisma_1.default.review.upsert({
-                    where: { revieweeId },
-                    update: {
-                        comments,
-                        reviewerId: payload.id,
-                    },
-                    create: {
-                        revieweeId,
-                        reviewerId: payload.id,
-                        comments,
-                    },
-                });
-                yield prisma_1.default.reviewee.update({
-                    where: { id: revieweeId },
-                    data: { status: true, submittedAt: new Date() },
-                });
-                if (!existingReview) {
-                    yield prisma_1.default.reviewer.update({
-                        where: { id: payload.id },
-                        data: { reviewedCount: { increment: 1 } },
+                // 1. Extract CV text from link using python extractor
+                let cvText = '';
+                if (re.cvLink) {
+                    cvText = yield new Promise((resolve) => {
+                        const scriptPath = path_1.default.join(__dirname, '../../scripts/extract_text.py');
+                        (0, child_process_1.exec)(`python "${scriptPath}" "${re.cvLink}"`, { encoding: 'utf8' }, (error, stdout, stderr) => {
+                            if (error) {
+                                console.error("Text extraction failed:", stderr || error.message);
+                                resolve('');
+                            }
+                            else {
+                                resolve(stdout.trim());
+                            }
+                        });
                     });
                 }
-                const re = yield prisma_1.default.reviewee.findUnique({
-                    where: { id: revieweeId },
-                    select: { email: true, name: true },
-                });
-                if (re === null || re === void 0 ? void 0 : re.email) {
-                    // Uncomment to send email notification
-                    // await transporter.sendMail({
-                    //   to: re.email,
-                    //   from: process.env.SMTP_FROM!,
-                    //   subject: 'Your CV has been reviewed',
-                    //   text: `Hi ${re.name},\n\nYour CV has been reviewed. Feedback:\n\n${comments.join('\n')}`,
-                    // })
+                // 2. Generate AI Suggestions using Groq API with key rotation
+                let aiSuggestions = '';
+                const groqKeysStr = process.env.GROQ_API_KEYS || '';
+                const groqKeys = groqKeysStr.split(',').map(k => k.trim()).filter(Boolean);
+                const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+                if (groqKeys.length > 0) {
+                    const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
                     const labels = [
                         'Structure & Format',
                         'Relevance to Domain',
@@ -194,20 +193,148 @@ class ReviewerController {
                         'Improvements in Projects',
                         'Additional Suggestions',
                     ];
-                    // const rawComments = [
-                    //   'Clear headings but add spacing.',
-                    //   'Good alignment with the target industry.',
-                    //   'Could use more examples to illustrate key points.',
-                    //   'Watch comma usage and tense consistency.',
-                    //   'Expand on your role in project outcomes.',
-                    //   'Consider adding a summary at the end.',
-                    // ]
-                    // pair label with each comment:
+                    const commentsText = comments.map((c, i) => `${labels[i] || 'Feedback'}: ${c}`).join('\n');
+                    const prompt = `
+You are an expert resume refiner. A student's CV was reviewed by a senior placement coordinator, who left specific diagnostic feedback.
+Your goal is to read the student's CV text (if available) and the reviewer's feedback, then write detailed, actionable, section-by-section refinement suggestions.
+Provide concrete "Before" vs "After" rewriting examples for their bullet points, projects, or structure, showing how they can rewrite lines to satisfy the reviewer's feedback.
+
+Candidate Profile/Track: ${re.profile}
+Reviewer's Diagnostic Feedback:
+${commentsText}
+
+${cvText ? `Here is the student's CV content (raw text): \n${cvText.slice(0, 8000)}` : 'Note: CV raw content is not directly readable. Use the Reviewer\'s Diagnostic Feedback to generate the optimal resume structure, best bullet points, and section improvements for their track.'}
+
+Provide your response in clean, premium Markdown formatting.
+`;
+                    // Try keys one by one
+                    for (let i = 0; i < groqKeys.length; i++) {
+                        const currentKey = groqKeys[i];
+                        try {
+                            const groqResponse = yield fetch(groqUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${currentKey}`
+                                },
+                                body: JSON.stringify({
+                                    model: groqModel,
+                                    messages: [
+                                        {
+                                            role: 'system',
+                                            content: 'You are an expert resume refiner. Provide direct, highly professional, actionable CV suggestions in clean markdown.'
+                                        },
+                                        {
+                                            role: 'user',
+                                            content: prompt
+                                        }
+                                    ],
+                                    temperature: 0.1
+                                })
+                            });
+                            if (groqResponse.ok) {
+                                const groqData = yield groqResponse.json();
+                                const content = ((_c = (_b = (_a = groqData.choices) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.content) || '';
+                                if (content.trim()) {
+                                    aiSuggestions = content;
+                                    break; // Success! Break out of the rotation loop
+                                }
+                                else {
+                                    console.warn(`Groq API key ${i + 1} succeeded but returned empty content. Trying next key.`);
+                                }
+                            }
+                            else {
+                                console.error(`Groq API key ${i + 1} failed status:`, groqResponse.status);
+                            }
+                        }
+                        catch (groqErr) {
+                            console.error(`Error calling Groq API with key ${i + 1}:`, groqErr);
+                        }
+                    }
+                }
+                // Offline fallback suggestions if Groq keys fail
+                if (!aiSuggestions) {
+                    aiSuggestions = `### AI CV Refinement Suggestions (Offline Fallback)
+The AI assistant is temporarily busy or reached its request limit. Here is a summary of recommended actions based on the reviewer's feedback:
+* **Address Reviewer Comments**: Focus on the specific items highlighted by the reviewer (e.g., improve structure, add domain-specific terminology).
+* **Quantify Results**: Try to add metrics (percentages, numbers) to your project descriptions and work experience bullet points.
+* **Format Consistency**: Ensure consistent margins, font sizes, and bullet styles throughout the document.`;
+                }
+                // Resolve reviewerId safely (especially if Admin)
+                let reviewerId = payload.id;
+                if (payload.isAdmin) {
+                    const matchingReviewer = yield prisma_1.default.reviewer.findFirst({
+                        where: { name: payload.name }
+                    });
+                    if (matchingReviewer) {
+                        reviewerId = matchingReviewer.id;
+                    }
+                    else {
+                        const adminReviewer = yield prisma_1.default.reviewer.findFirst({
+                            where: { admin: true }
+                        });
+                        if (adminReviewer) {
+                            reviewerId = adminReviewer.id;
+                        }
+                        else {
+                            const anyReviewer = yield prisma_1.default.reviewer.findFirst();
+                            if (anyReviewer) {
+                                reviewerId = anyReviewer.id;
+                            }
+                            else {
+                                const defaultReviewer = yield prisma_1.default.reviewer.create({
+                                    data: {
+                                        name: payload.name,
+                                        email: `${payload.name.toLowerCase().replace(/\s+/g, '')}@kgpian.iitkgp.ac.in`,
+                                        password: 'adminpassword',
+                                        reviewsNumber: 9999,
+                                        admin: true
+                                    }
+                                });
+                                reviewerId = defaultReviewer.id;
+                            }
+                        }
+                    }
+                }
+                const review = yield prisma_1.default.review.upsert({
+                    where: { revieweeId },
+                    update: {
+                        comments,
+                        aiSuggestions,
+                        reviewerId,
+                    },
+                    create: {
+                        revieweeId,
+                        reviewerId,
+                        comments,
+                        aiSuggestions,
+                    },
+                });
+                yield prisma_1.default.reviewee.update({
+                    where: { id: revieweeId },
+                    data: { status: true, submittedAt: new Date() },
+                });
+                if (!existingReview) {
+                    yield prisma_1.default.reviewer.update({
+                        where: { id: reviewerId },
+                        data: { reviewedCount: { increment: 1 } },
+                    });
+                }
+                if (re.email) {
+                    const labels = [
+                        'Structure & Format',
+                        'Relevance to Domain',
+                        'Depth of Explanation',
+                        'Language and Grammar',
+                        'Improvements in Projects',
+                        'Additional Suggestions',
+                    ];
                     const formattedComments = labels.map((label, idx) => `${label}: ${comments[idx]}`);
                     (0, mailer_1.sendReviewEmail)({
                         to: re.email,
                         userName: re.name,
                         reviewComments: formattedComments,
+                        aiSuggestions: aiSuggestions || undefined,
                     }).catch((mailErr) => {
                         console.error("Failsafe: Error sending review email:", mailErr);
                     });

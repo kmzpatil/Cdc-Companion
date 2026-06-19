@@ -56,6 +56,8 @@ model Reviewer {
 model Review {
   id           Int       @id @default(autoincrement())
   comments     String[]  // e.g. ["formatting OK","grammar needs work",…]
+  aiSuggestions String?  // Stores AI-generated suggestions
+  editCount    Int       @default(0)  // how many times the reviewer has submitted/edited this review (max 3)
   createdAt    DateTime  @default(now())
 
   reviewee     Reviewee  @relation(fields: [revieweeId], references: [id])

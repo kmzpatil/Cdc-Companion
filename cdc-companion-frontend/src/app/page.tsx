@@ -10,7 +10,8 @@ const PROFILES = [
   { key: 'Core', value: 'Core' },
   { key: 'Consult', value: 'Consult' },
   { key: 'Data', value: 'Data' },
-  { key: 'Finance/Quant', value: 'Finance/Quant' },
+  { key: 'Finance', value: 'Finance' },
+  { key: 'Quant', value: 'Quant' },
   { key: 'Product/FMCG', value: 'Product/FMCG' },
   { key: 'Software', value: 'Software' },
 ]

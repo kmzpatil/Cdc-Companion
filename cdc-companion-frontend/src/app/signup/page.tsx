@@ -8,7 +8,8 @@ import { BACKEND_URL } from '@/constants/apiConstants'
 const PROFILES = [
   { key: 'Software', value: 'SOFTWARE' },
   { key: 'Data', value: 'DATA' },
-  { key: 'Finance/Quant', value: 'FINANCE_QUANT' },
+  { key: 'Finance', value: 'FINANCE' },
+  { key: 'Quant', value: 'QUANT' },
   { key: 'Consult', value: 'CONSULT' },
   { key: 'Core', value: 'CORE' },
   { key: 'Product/FMCG', value: 'PRODUCT_FMCG' },
@@ -50,10 +51,10 @@ export default function ReviewerSignupPage() {
       return false
     }
 
-    // Roll Number prefix validation (must start with 2 digits represent seniority, e.g. 20 or 21)
-    const rollMatch = rollNo.trim().match(/^(\d{2})/)
-    if (!rollMatch) {
-      setError('Roll Number must start with the two-digit year (e.g. 21CS10001).')
+    // Roll Number validation: must be 23XX1... (2023 batch) or 22XX3... (2022 batch)
+    const reviewerRollRegex = /^(?:23[A-Za-z]{2}1|22[A-Za-z]{2}3)/
+    if (!reviewerRollRegex.test(rollNo.trim())) {
+      setError('Please recheck your Roll Number.')
       return false
     }
 

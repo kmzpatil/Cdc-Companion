@@ -147,7 +147,7 @@ function RevieweesTable({
                     <option value="">Unassigned</option>
                     {reviewers.map((reviewer) => (
                       <option key={reviewer.id} value={reviewer.id}>
-                        {reviewer.name} ({reviewer.reviewedCount}/{reviewer.reviewsNumber})
+                        {reviewer.name} ({reviewer.assignedCVs.length}/{reviewer.reviewsNumber})
                       </option>
                     ))}
                   </select>
@@ -257,7 +257,7 @@ function ReviewersTable({
                 <td>{reviewer.password}</td>
                 <td>{reviewer.profiles.join(', ')}</td>
                 <td>
-                  {reviewer.reviewedCount} / {reviewer.reviewsNumber}
+                  {reviewer.assignedCVs.length} / {reviewer.reviewsNumber}
                 </td>
                  <td>
                   {reviewer.assignedCVs && reviewer.assignedCVs.length > 0 ? (
