@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Reviewee {
   id           Int       @id @default(autoincrement())
   name         String
@@ -43,7 +42,7 @@ model Reviewer {
   name          String
   password      String
   profiles      String[]  @default([])
-  reviewsNumber      Int        // how many CVs they can handle
+  reviewsNumber Int        // how many CVs they can handle
   reviewedCount Int        @default(0)
   email         String     @unique
   admin         Boolean    @default(false)
@@ -55,7 +54,7 @@ model Reviewer {
 /// A set of feedback strings, one per criterion
 model Review {
   id           Int       @id @default(autoincrement())
-  comments     String[]  // e.g. ["formatting OK","grammar needs work",…]
+  comments     String[]  // e.g. ["formatting OK","grammar needs work"]
   aiSuggestions String?  // Stores AI-generated suggestions
   editCount    Int       @default(0)  // how many times the reviewer has submitted/edited this review (max 3)
   createdAt    DateTime  @default(now())
@@ -64,4 +63,10 @@ model Review {
   revieweeId   Int       @unique
   reviewer     Reviewer  @relation("ReviewerToReview", fields: [reviewerId], references: [id])
   reviewerId   Int
+}
+
+model SystemState {
+  id          String @id @default("global")
+  geminiIndex Int    @default(0)
+  groqIndex   Int    @default(0)
 }
