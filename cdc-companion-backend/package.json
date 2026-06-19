@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
-    "build": "tsc && copyfiles -u 1 \"src/assets/**/*\" dist/assets",
+    "build": "tsc && copyfiles -u 1 \"src/assets/**/*\" dist/assets && copyfiles -u 1 \"src/controllers/AI_Specs/*.md\" dist",
     "postinstall": "prisma generate",
     "start": "node dist/index.js"
   },
