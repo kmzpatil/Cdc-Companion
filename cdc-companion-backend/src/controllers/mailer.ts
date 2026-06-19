@@ -311,12 +311,19 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
 export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void> {
   const html = buildReviewEmail(options)
   
-  await transporter.sendMail({
-    from: `"Communiqué, IIT Kharagpur" <${process.env.SMTP_USER}>`,
-    to: options.to,
-    subject: '🎉 Your CV Review is Ready!',
-    html,
-  })
+  console.log(`[MAILER] Preparing to send review email to: ${options.to}`)
+  try {
+    const info = await transporter.sendMail({
+      from: `"Communiqué, IIT Kharagpur" <${process.env.SMTP_USER}>`,
+      to: options.to,
+      subject: '🎉 Your CV Review is Ready!',
+      html,
+    })
+    console.log(`[MAILER] Review email sent successfully to: ${options.to}. Message ID: ${info.messageId}`)
+  } catch (error) {
+    console.error(`[MAILER ERROR] Failed to send review email to: ${options.to}`, error)
+    throw error
+  }
 }
 
 /**

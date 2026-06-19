@@ -254,6 +254,7 @@
         const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
         
         if (groqKeys.length > 0) {
+          console.log(`[LLM PROCESS] Initiating Groq API with ${groqKeys.length} keys`);
           const groqUrl = 'https://api.groq.com/openai/v1/chat/completions'
           
           const labels = [
@@ -320,13 +321,16 @@
                 const groqData = await groqResponse.json() as any
                 const content = groqData.choices?.[0]?.message?.content || ''
                 if (content.trim()) {
+                  console.log(`[LLM PROCESS] Groq API key ${i+1} succeeded. Generated content length: ${content.length}`);
                   aiSuggestions = content
                   break; // Success! Break out of the rotation loop
                 } else {
-                  console.warn(`Groq API key ${i+1} succeeded but returned empty content. Trying next key.`)
+                  console.warn(`[LLM PROCESS WARNING] Groq API key ${i+1} succeeded but returned empty content. Trying next key.`)
                 }
               } else {
-                console.error(`Groq API key ${i+1} failed status:`, groqResponse.status)
+                console.error(`[LLM PROCESS ERROR] Groq API key ${i+1} failed status:`, groqResponse.status)
+                const errorText = await groqResponse.text().catch(() => 'no text');
+                console.error(`[LLM PROCESS ERROR DETAILS]`, errorText);
               }
             } catch (groqErr) {
               console.error(`Error calling Groq API with key ${i+1}:`, groqErr)
@@ -420,13 +424,14 @@
             `${label}: ${comments[idx]}`
           )
 
+          console.log(`[REVIEW CONTROLLER] Triggering sendReviewEmail to ${re.email}`);
           sendReviewEmail({
             to: re.email,
             userName: re.name,
             reviewComments: formattedComments,
             aiSuggestions: aiSuggestions || undefined,
           }).catch((mailErr) => {
-            console.error("Failsafe: Error sending review email:", mailErr)
+            console.error("[REVIEW CONTROLLER FAILSAFE ERROR] Error sending review email:", mailErr)
           })
         }
 
