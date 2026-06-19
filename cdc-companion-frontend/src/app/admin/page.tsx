@@ -10,6 +10,7 @@ interface Reviewee {
   name: string
   rollNo: string
   email: string | null
+  password?: string
   cvLink: string | null
   profile: string
   status: boolean
@@ -95,8 +96,10 @@ function RevieweesTable({
   const columns = [
     { key: 'id', title: 'ID' },
     { key: 'name', title: 'Name' },
-    { key: 'rollNo', title: 'Roll Number' },
+    { key: 'rollNo', title: 'Roll/Email' },
+    { key: 'password', title: 'Password' },
     { key: 'profile', title: 'Profile' },
+    { key: 'cvLink', title: 'CV Link' },
     { key: 'assignedToId', title: 'Assigned To' },
     { key: 'status', title: 'Status' },
   ]
@@ -134,7 +137,22 @@ function RevieweesTable({
                 <td>{reviewee.id}</td>
                 <td>{reviewee.name}</td>
                 <td>{reviewee.rollNo}</td>
+                <td className="font-mono text-xs">{reviewee.password || '-'}</td>
                 <td>{reviewee.profile}</td>
+                <td>
+                  {reviewee.cvLink ? (
+                    <a
+                      href={reviewee.cvLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-[#7c3aed] hover:underline"
+                    >
+                      Open CV
+                    </a>
+                  ) : (
+                    <span className="text-xs text-gray-500">No CV</span>
+                  )}
+                </td>
                  <td>
                   <select
                     value={reviewee.assignedToId ?? ''}

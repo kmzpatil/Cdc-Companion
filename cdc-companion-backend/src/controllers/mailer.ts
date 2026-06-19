@@ -14,10 +14,15 @@ export interface ReviewEmailOptions {
 
 // 1. Create transporter
 const smtpPort = Number(process.env.SMTP_PORT) || 587;
+const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+const isSecure = smtpPort === 465;
+
+console.log(`[MAILER CONFIG] Initializing Transporter. Host: ${smtpHost}, Port: ${smtpPort}, Secure: ${isSecure}`);
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
+  host: smtpHost,
   port: smtpPort,
-  secure: smtpPort === 465, // true for port 465, false for 587 (STARTTLS)
+  secure: isSecure,
   auth: {
     user: process.env.SMTP_USER!,
     pass: process.env.SMTP_PASS!,
@@ -312,7 +317,7 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
 export async function sendReviewEmail(options: ReviewEmailOptions): Promise<void> {
   const html = buildReviewEmail(options)
   
-  console.log(`[MAILER] Preparing to send review email to: ${options.to}`)
+  console.log(`[MAILER] Preparing to send review email to: ${options.to} (Using ${smtpHost}:${smtpPort})`)
   try {
     const info = await transporter.sendMail({
       from: `"Communiqué, IIT Kharagpur" <${process.env.SMTP_USER}>`,
