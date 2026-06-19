@@ -376,7 +376,7 @@
             - Start DIRECTLY with the first section heading.
             - YOU MUST use markdown headings (###) for EVERY section title (e.g., ### Tech Stack Audit). Do not just bold the text.
             - Use bullet points (-) for individual suggestions under each section.
-            - If providing a rewrite, use "**Before:**" and "**After:**" formatting on the SAME LINE as the bullet point.
+            - If providing a rewrite, use NESTED bullet points (indented with spaces) for "**Before:**" and "**After:**" under the main suggestion bullet.
             
             Candidate Profile/Track: ${re.profile}
             Reviewer's Diagnostic Feedback:

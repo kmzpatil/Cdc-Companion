@@ -438,10 +438,17 @@ function parseMarkdownToHtml(markdown: string): string {
     }
 
     // Bullet points — group into <ul>
-    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+    const listMatch = line.match(/^(\s*)(?:[*-])\s+(.*)$/);
+    if (listMatch) {
+      const indent = listMatch[1].length;
       if (!inList) { output.push('<ul class="list-disc ml-5 space-y-3 my-4">'); inList = true; }
-      const content = trimmed.substring(2).trim();
-      output.push(`<li class="text-sm text-[#333a42] dark:text-gray-200 leading-relaxed marker:text-accent">${parseInlineMarkdown(content)}</li>`);
+      const content = listMatch[2].trim();
+      
+      if (indent > 0) {
+        output.push(`<li class="text-sm text-[#4f5964] dark:text-gray-300 leading-relaxed marker:text-gray-400 ml-6 list-[circle] mt-2">${parseInlineMarkdown(content)}</li>`);
+      } else {
+        output.push(`<li class="text-sm text-[#333a42] dark:text-gray-200 leading-relaxed marker:text-accent">${parseInlineMarkdown(content)}</li>`);
+      }
       continue;
     }
 

@@ -480,13 +480,20 @@ function parseMarkdownToHtml(markdown: string): string {
     }
 
     // Bullet points — group into <ul>
-    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+    const listMatch = line.match(/^(\s*)(?:[*-])\s+(.*)$/);
+    if (listMatch) {
+      const indent = listMatch[1].length;
       if (!inList) {
         output.push('<ul style="margin:16px 0;padding-left:24px;">');
         inList = true;
       }
-      const content = trimmed.substring(2).trim();
-      output.push(`<li style="font-size:15px;color:#334155;margin-bottom:10px;line-height:1.7;">${parseInlineMarkdown(content)}</li>`);
+      const content = listMatch[2].trim();
+      
+      if (indent > 0) {
+        output.push(`<li style="font-size:14px;color:#475569;margin-bottom:8px;line-height:1.6;margin-left:16px;list-style-type:circle;">${parseInlineMarkdown(content)}</li>`);
+      } else {
+        output.push(`<li style="font-size:15px;color:#334155;margin-bottom:10px;line-height:1.7;">${parseInlineMarkdown(content)}</li>`);
+      }
       continue;
     }
 
