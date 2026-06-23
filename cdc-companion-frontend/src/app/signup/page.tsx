@@ -158,7 +158,7 @@ export default function ReviewerSignupPage() {
               As CDC season approaches, we are organizing events to guide students, and your expertise would greatly benefit them. We would be delighted if you could participate as a CV Reviewer in the CV Review Drive and review 3-5 student CVs to help refine their applications.
             </p>
             <p className="text-xs text-[#4f5964] italic">
-              *Tentative date for CV Review is 16th June onwards.
+              *Tentative date for CV Review is 28th June onwards.
             </p>
           </div>
         </aside>
@@ -266,7 +266,7 @@ export default function ReviewerSignupPage() {
 
             <div>
               <label className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
-                Are you interested in becoming an interviewer in the Mock Interviewer Drive? *
+                Are you interested in becoming an interviewer in the Mock Interview Drive? *
               </label>
               <div className="flex gap-4 p-2">
                 <label className="flex items-center gap-2 cursor-pointer">
