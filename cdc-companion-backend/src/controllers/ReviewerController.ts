@@ -84,9 +84,9 @@
     // POST /api/reviewer/signup
     async signup(req: Request, res: Response, next: NextFunction) {
       try {
-        const { name, rollNo, email, contactNumber, profiles, reviewsNumber } = req.body
+        const { name, rollNo, email, contactNumber, profiles, reviewsNumber, interestedInMockInterview } = req.body
 
-        if (!name || !rollNo || !email || !profiles || !reviewsNumber) {
+        if (!name || !rollNo || !email || !profiles || !reviewsNumber || interestedInMockInterview === undefined) {
           return res.status(400).json({ error: 'Missing required fields' })
         }
 
@@ -115,7 +115,8 @@
             email,
             profiles,
             reviewsNumber: Number(reviewsNumber),
-            reviewedCount: 0
+            reviewedCount: 0,
+            interestedInMockInterview: Boolean(interestedInMockInterview)
           }
         })
 

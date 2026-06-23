@@ -23,13 +23,14 @@ export default function ReviewerSignupPage() {
     contactNumber: '',
     reviewsNumber: 5,
     selectedProfiles: [] as string[],
+    interestedInMockInterview: null as boolean | null,
     queries: '',
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleInputChange = (field: string, value: string | number | string[]) => {
+  const handleInputChange = (field: string, value: string | number | string[] | boolean | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -63,6 +64,11 @@ export default function ReviewerSignupPage() {
       return false
     }
 
+    if (formData.interestedInMockInterview === null) {
+      setError('Please answer if you are interested in becoming an interviewer.')
+      return false
+    }
+
     return true
   }
 
@@ -84,6 +90,7 @@ export default function ReviewerSignupPage() {
           contactNumber: formData.contactNumber.trim(),
           profiles: formData.selectedProfiles,
           reviewsNumber: formData.reviewsNumber,
+          interestedInMockInterview: formData.interestedInMockInterview,
         }),
       })
 
@@ -254,6 +261,34 @@ export default function ReviewerSignupPage() {
                     </label>
                   )
                 })}
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[13px] font-semibold text-[#1b2126]">
+                Are you interested in becoming an interviewer in the Mock Interviewer Drive? *
+              </label>
+              <div className="flex gap-4 p-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="interestedInMockInterview"
+                    checked={formData.interestedInMockInterview === true}
+                    onChange={() => handleInputChange('interestedInMockInterview', true)}
+                    className="h-4 w-4 border-border text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm font-medium text-[#4f5964]">Yes</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="interestedInMockInterview"
+                    checked={formData.interestedInMockInterview === false}
+                    onChange={() => handleInputChange('interestedInMockInterview', false)}
+                    className="h-4 w-4 border-border text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm font-medium text-[#4f5964]">No</span>
+                </label>
               </div>
             </div>
 
