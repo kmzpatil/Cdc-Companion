@@ -527,6 +527,10 @@ async function sendReviewerRegistrationEmail(to: string, userName: string, passw
           <td class="label">Portal Password</td>
           <td class="val"><span class="password-box">${password}</span></td>
         </tr>
+        <tr>
+          <td class="label">Login Portal</td>
+          <td class="val"><a href="https://cdc-companion.cqiitkgp.com/login/reviewer" style="color: #7c3aed; font-weight: bold; text-decoration: none;">https://cdc-companion.cqiitkgp.com/login/reviewer</a></td>
+        </tr>
       </table>
 
       <p style="font-size: 13px; color: #5a5f66; background-color: #f5f3ff; padding: 12px; border-radius: 8px; border-left: 4px solid #7c3aed;">
@@ -630,6 +634,10 @@ async function sendReviewerReminderEmail(to: string, userName: string, password:
         <tr>
           <td class="label">Password</td>
           <td class="val"><span class="password-box">${password}</span></td>
+        </tr>
+        <tr>
+          <td class="label">Login Portal</td>
+          <td class="val"><a href="https://cdc-companion.cqiitkgp.com/login/reviewer" style="color: #7c3aed; font-weight: bold; text-decoration: none;">https://cdc-companion.cqiitkgp.com/login/reviewer</a></td>
         </tr>
       </table>
 

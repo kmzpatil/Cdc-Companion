@@ -59,6 +59,7 @@ export default function ReviewerDashboardPage() {
     }
 
     void loadAssigned()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 
   const loadAssigned = async () => {
@@ -88,7 +89,14 @@ export default function ReviewerDashboardPage() {
       const nextRes = await authFetch(`${BACKEND_URL}/api/reviewer/next`)
 
       if (!nextRes.ok && nextRes.status !== 204) {
+        if (nextRes.status === 409) {
+          throw new Error('CV was just assigned to someone else. Please try again.')
+        }
         throw new Error('Failed to fetch next CV')
+      }
+
+      if (nextRes.status === 204) {
+        setError('No more CVs available for your assigned profiles.')
       }
 
       await loadAssigned()

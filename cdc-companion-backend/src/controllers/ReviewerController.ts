@@ -203,10 +203,14 @@
       //     data: { reviewedCount: { increment: 1 } },
       //   })
 
-        await prisma.reviewee.update({
-          where: { id: reviewee.id },
+        const updateResult = await prisma.reviewee.updateMany({
+          where: { id: reviewee.id, assignedToId: null },
           data: { assignedToId: payload.id },
         })
+
+        if (updateResult.count === 0) {
+          return res.status(409).json({ error: 'CV was just assigned to someone else. Please try again.' })
+        }
 
         return res.json(reviewee)
       } catch (err) {

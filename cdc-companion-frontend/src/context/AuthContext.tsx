@@ -88,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(jwt)
       setUser(me)
       localStorage.setItem('auth', JSON.stringify({ token: jwt, user: me }))
+      localStorage.setItem('token', jwt)
       return true
     } catch (err) {
       console.error('Login failed', err)
