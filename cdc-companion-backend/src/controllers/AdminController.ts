@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import prisma from '../prisma'
+import { sendReviewerReminderEmail } from './mailer'
 
 
 function normalizeProfile(p: string): string {
@@ -274,6 +275,52 @@ async allocate(req: Request, res: Response, next: NextFunction) {
       }
 
       return res.json({ message: 'Assignment updated successfully' })
+    } catch (err: any) {
+      next(err)
+    }
+  }
+
+  // POST /api/admin/remind
+  async sendReminder(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reviewerId } = req.body
+
+      if (reviewerId) {
+        // Remind a single reviewer
+        const rId = parseInt(reviewerId, 10)
+        const reviewer = await prisma.reviewer.findUnique({
+          where: { id: rId },
+          include: { assignedCVs: true }
+        })
+
+        if (!reviewer) {
+          return res.status(404).json({ error: 'Reviewer not found' })
+        }
+
+        const pendingCVs = reviewer.assignedCVs.filter(cv => !cv.status)
+        if (pendingCVs.length === 0) {
+          return res.status(400).json({ error: 'Reviewer has no pending CV reviews' })
+        }
+
+        await sendReviewerReminderEmail(reviewer.email, reviewer.name, reviewer.password, pendingCVs.length)
+        return res.json({ message: `Reminder email successfully sent to ${reviewer.name}` })
+      } else {
+        // Remind all reviewers who have pending CVs
+        const reviewers = await prisma.reviewer.findMany({
+          include: { assignedCVs: true }
+        })
+
+        let emailsSent = 0
+        for (const reviewer of reviewers) {
+          const pendingCVs = reviewer.assignedCVs.filter(cv => !cv.status)
+          if (pendingCVs.length > 0) {
+            await sendReviewerReminderEmail(reviewer.email, reviewer.name, reviewer.password, pendingCVs.length)
+            emailsSent++
+          }
+        }
+
+        return res.json({ message: `Reminder emails successfully sent to ${emailsSent} reviewer(s)` })
+      }
     } catch (err: any) {
       next(err)
     }

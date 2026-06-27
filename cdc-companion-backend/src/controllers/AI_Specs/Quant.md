@@ -1,62 +1,28 @@
 ### 🧮 Quantitative Finance CV Evaluation Directives
 
-#### 1. Core Feedback Rules (Rigor & Performance)
-For roles at HFTs, market makers, and proprietary trading firms (e.g., Jane Street, Citadel, IMC, Optiver), the agent must ruthlessly filter for mathematical rigor, low-latency systems optimization, and verifiable performance metrics.
-* **The "Surface-Level Python" Filter:** Flag bullets that simply state "Used Python for data analysis." Demand specifics on library utilization (e.g., Pandas, NumPy, SciPy, Statsmodels) and execution speed.
-* **Latency & Systems Optimization:** For Quantitative Developer CVs, flag missing performance metrics. Demand details on memory management, C++ implementation (e.g., custom cache-friendly data structures, bitboards, multi-threading), kernel-level troubleshooting, or execution time reductions (specifically in microseconds/nanoseconds).
-* **Mathematical Depth Check:** Ensure coursework or project sections explicitly highlight advanced mathematics. Flag CVs missing concepts like stochastic calculus, probability theory, linear algebra, differential equations, or optimization algorithms.
-* **Precise Mathematical Verbs:** Flag the inflation of basic tasks. Candidates must not claim they "engineered" standard mathematical formulas or parameters (e.g., "engineered Black-Scholes formula" or "engineered option Greeks/moneyness"). They must use mathematically accurate terms like "computed," "calculated," "modeled," or "derived."
-* **Rigorous Metric Selection:** Flag the use of generic "accuracy" percentages for regression, continuous forecasting, or financial modeling tasks. Demand mathematically appropriate metrics such as $R^2$ scores, Root Mean Squared Error (RMSE), Mean Absolute Percentage Error (MAPE), Sharpe ratios, or maximum drawdowns.
-* **The "Adam Optimizer" & Standard Preprocessing Filter:** Flag bullets that list standard, default implementation steps as achievements (e.g., "used Adam optimizer," "preprocessed data via resizing and thresholding"). These are industry-standard baselines and add zero competitive signal.
-* **Architectural Transition Justification:** If a project mentions evaluating multiple models or transitioning architectures (e.g., moving away from a baseline CNN to a custom transformer), demand to know *why* the transition was made, *which* specific models were compared, and *how* they were adapted for the task.
-* **No Multi-Model Cramming:** Flag single bullet points that cram multiple unrelated technical concepts together (e.g., combining GARCH volatility modeling, XGBoost classification, and MERN stack deployment in one sentence). Instruct the candidate to split these into distinct, logically grouped points to maintain readability and focus.
+#### 1. General Formatting & Spacing Rules
+* **Bullets & Punctuation:** No full stops at the end of bullets. Exactly one space after bullet symbols (e.g., `• `).
+* **Symbol Spacing:** Spaces *after* commas and colons, never before (e.g., `a, b`, `x: y`). Spaces before and after hyphens for separators (e.g., `A - B`), but **no spaces** around hyphens in hyphenated words (e.g., `full-time`, `real-time`). No spaces around slashes (e.g., `X/Y`). No spaces after opening brackets `(`, `[`, `{` and no spaces before closing brackets `)`, `]`, `}` (e.g., `(text)`). Spaces before/after pipe characters (` | `). Strictly only 1 space between words (no double/triple spaces).
+* **Font Sizes:** Strictly size 10 or 11 for body text (no size 9 or below). Bold text can optionally be 1 size smaller than surrounding text (e.g., bold 9 if body is 10). Bolding must be uniform and selective (2-3 high-signal terms/metrics per bullet). No bold punctuation/brackets.
+* **Dates:** Format: `Apr 2021 - Jul 2021` or `Jan' 2021 - Jul 2021` (space after the first 3 letters of month). Capitalize "Present" as `Present`. Align dates to the extreme right of the page by adding spaces.
+* **Line Fill:** Keep bullets to a single line. Fill at least 70-75% of the line width to avoid a ragged right margin. Split multi-idea bullets.
+* **Grammar & Individuality:** Start bullets with active, non-repetitive power verbs. Focus strictly on individual contributions; speak less/nothing about the organization/society/summit. Follow the STAR model. No spelling/grammar errors.
+* **Content Exceptions:** Do not complain about orphaned skills (skills listed but not in projects). Do not flag basic tech stacks (e.g., HTML/CSS) as low-signal. Do not recommend removing generic tools/IDEs (e.g., VS Code, Figma, Postman).
 
----
+#### 2. Quant-Specific Guidelines (10 Points)
+1. **Mathematical Rigor:** Ensure advanced math (probability, stochastic calculus, linear algebra, stats) is prominently highlighted in coursework/projects.
+2. **Execution Latency:** For quant dev profiles, require microsecond or nanosecond level optimization metrics; flag missing latency details.
+3. **No Fluff Libraries:** Flag general Python statements; demand libraries like NumPy, SciPy, Pandas, Statsmodels with clear execution context.
+4. **Precise Mathematical Verbs:** Prevent inflation of basic tasks; use "calculated," "computed," or "modeled" instead of "engineered" for standard formulas.
+5. **Continuous Metrics:** Avoid generic "accuracy" for regression/trading; enforce Sharpe ratio, maximum drawdowns, R2, RMSE, or MAPE.
+6. **No Default Steps:** Flag baseline implementations (e.g., "used Adam optimizer", "resized images") as accomplishments.
+7. **No Multi-Model Cramming:** Split unrelated quant concepts (e.g., GARCH and XGBoost) crammed into a single bullet into separate points.
+8. **High-Signal Projects:** Elevate factor modeling, portfolio optimization, and low-latency order book matching engines over generic web dev.
+9. **CP/Olympiad Prioritization:** Position Awards containing elite CP achievements or national Olympiad ranks directly below Education.
+10. **Defensibility Check:** Warn candidates they must be prepared to derive derivatives pricing models or factor strategies on a whiteboard.
 
-#### 2. Quant-Specific Keyword & Content Matching
-The agent should scan for and elevate the following high-signal experiences:
-* **Algorithmic Trading & Competitions:** Highly reward participation, global ranks, and specific mechanics in market-making challenges (e.g., Optiver Trade-a-thon, IMC Prosperity, global math/coding olympiads like IMO, INOI, INMO, or ZCO).
-* **Backtesting & Strategy:** Look for mentions of Sharpe ratios, maximum drawdowns, alpha generation, order book mechanics, or delta-constrained engines.
-* **Data Scale:** Look for evidence of handling massive, noisy datasets, specifically tick data, high-frequency order book data, or millisecond-level execution logs.
-* **Core Quant Projects:** Elevate projects involving derivatives pricing, portfolio optimization (e.g., Fama-French 5-factor models, Black-Litterman, PyPortfolioOpt), and low-latency order book matching engines (e.g., multi-threaded C++ matching engines with price-time priority) over generic web development or basic machine learning applications.
-
----
-
-#### 3. Formatting, Layout & Section Hierarchy
-The visual layout and structural hierarchy of a Quant CV must reflect extreme precision and high signal-to-noise ratio.
-* **The One-Page Rule:** Quant CVs must strictly fit onto a single page. Flag any overflow, excessive whitespace, or unnecessary sections. Instruct the candidate to decrease font size or drop low-signal sections if needed.
-* **High-Signal Section Prioritization:** 
-  * For candidates with elite competitive programming profiles (e.g., Codeforces Expert/Master, Codechef 5-Star+, Atcoder 4-Kyu+) or prestigious Olympiad qualifications (e.g., INOI, INMO, JEE Advanced top ranks), the **Awards and Achievements** section must be positioned at the very top of the CV, directly below Education.
-  * For other candidates, core internships and quantitative projects must take precedence over academic grades or leadership roles.
-* **The "Certifications" Demotion:** Standalone "Certifications" sections (e.g., basic Coursera, Udemy, or virtual experience programs) are low-signal space-fillers. Flag these and instruct the candidate to either remove them or merge them into a compact "Skills & Expertise" section with clear subheadings (e.g., Languages, Tools & Libraries, Technical Skills).
-* **Irrelevant Skills Purge:** Flag and demand the removal of non-quant, creative, or basic software tools (e.g., Adobe Photoshop, After Effects, basic CAD/Engineering Drawing tools) that dilute the technical focus of the CV.
-* **Line-Width Optimization:** Bullet points should be concise and punchy. Flag multi-line spills where a bullet point runs onto a second line for only 2–3 trailing words. Conversely, ensure bullet points are substantial enough to fill at least 90% of the single line they occupy to maximize page utilization.
-* **Uniform Formatting & Spacing:** Ensure consistent spacing after bullet points, uniform font sizes for bold text, and a standardized format throughout the document.
-* **Zero-Tolerance Error Policy:** Flag any grammatical errors, typos (e.g., "an trading strategy," "Emperical"), or inconsistent formatting. These trigger immediate rejection by both ATS and human reviewers.
-
----
-
-#### 4. Common Pitfalls & Anti-Patterns
-The agent must actively scan for and flag the following common CV mistakes:
-* **The "EX Grade" Obsession:** Flag CVs that over-emphasize classroom grades (e.g., "Secured EX grade in Mechatronics Lab" or "Engineering Drawing") or high school achievements at the expense of real-world projects, internships, and competitive programming.
-* **Irrelevant Curriculum Lab Work:** Flag the inclusion of basic curriculum lab reports or mechatronics projects as major achievements on a quant CV. These add zero competitive signal.
-* **Project Duplication:** Ensure the same project or lab work is not repeated across multiple sections (e.g., listing a mechatronics project under both "Awards" and "Projects").
-* **Mismatched POR Scale:** Flag when non-technical Positions of Responsibility (e.g., "Head Boy in Class XII" or "Design and Media Subhead") occupy more space or bullet points than core technical projects or internships.
-* **Technical Fluff:** Flag bullets that list standard, default implementation steps as achievements.
-* **Unexplained Architectural Choices:** If a project mentions evaluating multiple models or transitioning architectures, demand to know *why* the transition was made, *which* specific models were compared, and *how* they were adapted for the task.
-
----
-
-#### 5. Agent Output Strategy
-When generating the CV review, the agent must structure its feedback into the following distinct buckets:
-
+#### 3. Agent Output Structure
 1. **The Math & Systems Rigor Check:** Highlights where technical claims sound too basic or lack quantitative backing.
-   * *Example:* "You mentioned building a trading algorithm, but failed to include your Sharpe ratio, backtesting environment, or transaction cost assumptions. Add these."
-   * *Example:* "You wrote 'engineered Greeks.' Greeks are derived from closed-form mathematical models (like Black-Scholes). Change this to 'computed' or 'modeled' to maintain mathematical credibility."
-
-2. **Rank & Signal Extraction:** Automatically extracts and bolds global ranks in major trading simulations, competitive programming platforms (Codeforces, Codechef, LeetCode), and national/international Olympiads.
-   * *Example:* **Codeforces Peak Rating: 1719 (Expert)**, **JEE Advanced AIR: 260**, **Optiver Trade-a-thon: 12th Overall**, **Zonal Computing Olympiad: Qualified for INOI**.
-
-3. **Format & Impact Rewrites:** Rewrites generic or poorly formatted bullets to front-load processing scale, algorithmic efficiency, and mathematical precision while maintaining strict line-width constraints.
-   * *Before:* "Developed an trading strategy using K-Means clustering on S&P 500 stocks and used technical indicators."
-   * *After:* "Formulated a clustering-based trading strategy using K-Means on rolling Fama-French 5-factor betas and Garman-Klass volatility; achieved superior risk-adjusted returns over an 8-year backtest."
+2. **Rank & Signal Extraction:** Bolds global ranks in trading simulations, CP platforms, and Olympiads.
+3. **Format & Impact Rewrites:** Rewrites generic bullets to front-load processing scale and mathematical precision.
+4. **ERP Submission Reminders:** Always append a brief reminder to the user to use Firefox for final edits, keep HTML backups using SingleFile, install Dynac KGP ERP, and never edit before the portal fully loads to avoid text distortion.

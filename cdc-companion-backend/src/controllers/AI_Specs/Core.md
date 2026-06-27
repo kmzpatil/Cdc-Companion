@@ -1,71 +1,28 @@
 ### ⚙️ Core Engineering (Electrical / Mechanical / Civil / Chemical / Aerospace) CV Evaluation Directives
 
-#### 1. Strict Typographical & Formatting Rules
-Reviewers in the Core domain are extremely particular about formatting consistency, visual alignment, and space utilization. Your agent must flag and correct the following:
-* **The "Zero White Space" Rule:** Actively penalize bullet points that leave significant blank space at the end of a line. Every bullet point must be written to fill at least 90% of the page width, extending to the very edge of the right margin. If a CV has empty space at the bottom of the page, prompt the user to increase the font size slightly, add more technical content, or include relevant extracurricular activities (such as Hall-level involvements like Illumination, Rangoli, or General Championships) to ensure a completely filled, single-page layout.
-* **Line Length & Spillover Constraint:** Each bullet point must be exactly one line long. Double-line bullet points must be flagged for compression, conciseness, or split into two distinct, single-line points. Strongly penalize "spillovers" where only one or two words leak onto a second line, as this wastes vertical space and looks highly unprofessional. If a second line is absolutely necessary, it must fill at least 90% of that second line.
-* **Alignment & Indentation:** Ensure that the second line of any multi-line bullet point is perfectly aligned and indented with the start of the text on the first line (not under the bullet symbol itself). Remove any accidental leading white spaces in project titles, section headers, or bullet points.
-* **Broken Word & Spacing Audit:** Actively scan for and flag merged words, missing spaces, or broken words resulting from poor PDF rendering or text extraction (e.g., "B.Tech.(Hons.)inELECTR ICALENGINEERING", "Designedand Implemen ted", "BoardOf", or "Biringen &Chow"). Ensure proper spacing around punctuation and mathematical operators.
-* **Font Sizing, Bolding & Hierarchy:** Headings must be exactly +1 size larger than body text. Unbolded body text should be standard (9-10pt). 
-    * **Bolding Rules:** Bold key technical terms (e.g., **FFT**, **FSM**, **MOSFET**) and quantitative metrics (e.g., **60dB**, **180nm**) to make them stand out. Do not bold long phrases, clauses, or entire sentences. Keep bolded terms short, precise, and impactful.
-    * **Bold Font Size Adjustment:** Ensure that bolded words do not visually disrupt line spacing or appear oversized. Bolded text should be styled or sized slightly down (e.g., by 0.5pt or 1pt) to align perfectly with the surrounding unbolded text.
-    * **No Partial Bolding:** Ensure complete words or hyphenated terms are bolded entirely (e.g., bold "**multi-nozzle**" instead of only "**multi**-nozzle").
-    * **Metadata Bolding:** Only the project or internship title should be bolded. Accompanying metadata (such as "Self Project", "Course Project", "Guided Project", "Research Internship", or location) must remain unbolded.
-* **No Terminal Punctuation:** Flag any bullet points that end with a full stop (period). Sentences must be left open to maintain a clean, modern resume aesthetic. However, ensure that sentences are grammatically complete and do not read as fragmented phrases.
-* **Numeric Precision & Formatting:** Enforce strict formatting for percentages, ranks, and years. 
-    * Flag single-decimal percentages and suggest double-decimal precision (e.g., flag `96.5%` and suggest `96.50%`).
-    * Flag abbreviated years and suggest full four-digit years (e.g., flag `'23` or `Jan' 23` and suggest `2023` or `Jan 2023`).
-    * Ensure state and national ranks are written clearly without redundant soft-skill qualifiers (e.g., write "Secured All India Rank of 804" instead of "Ranked 804 showing problem-solving skills" or "reflecting drive and merit").
-    * **CGPA Representation:** Always format CGPAs out of 10 (e.g., flag `8.1` or `8.10` and suggest `8.10 / 10` or `8.10/10`).
-    * **Consistent Numbering Systems:** Do not mix Indian numbering systems (Lakhs, Crores) with Western numbering systems (Millions, Billions) in the same CV. Choose one system (preferably Western or standard numeric digits like `1,000,000` or `100,000`) and maintain strict consistency across all sections.
-* **Timeline Alignment:** Ensure all dates and timelines are strictly right-aligned (RHS) on the same line as their respective section or project headers. Avoid using square brackets `[ ]` or parentheses `( )` around dates; use standard formats (e.g., `Aug 2024 - Nov 2024` or `May 2025`).
-* **Bullet Points in Every Section:** Every single section—including Awards, Extracurriculars, and Certifications—must use consistent bullet points. Raw paragraphs, numbered lists, or floating text blocks are strictly prohibited. Ensure standard solid circular bullets (`•` or `*` in markdown) are present at the beginning of every line in the Extracurriculars and POR sections. Do not use hyphens `-`, hollow circles `o`, or other non-standard symbols as bullets.
-* **No Abbreviations in Section Headers & Board Names:** Section headers must use full, formal names (e.g., flag "Math" and suggest "Mathematics"). Similarly, school boards must be written out fully (e.g., flag "CBSE" or "ICSE" and suggest "AISSCE (CBSE)" or "ICSE Board").
-* **No All-Caps in Body Text:** Avoid using all-capital letters for emphasis within body text (e.g., flag "BOTTOM BIN" or "BOARD OF EDUCATION" and suggest standard title casing).
-* **Hyperlink Formatting:** In sections like Certifications or Projects, avoid pasting raw, long URLs. Use clean, professional hyperlinks or remove them if they disrupt the visual layout.
+#### 1. General Formatting & Spacing Rules
+* **Bullets & Punctuation:** No full stops at the end of bullets. Exactly one space after bullet symbols (e.g., `• `).
+* **Symbol Spacing:** Spaces *after* commas and colons, never before (e.g., `a, b`, `x: y`). Spaces before and after hyphens for separators (e.g., `A - B`), but **no spaces** around hyphens in hyphenated words (e.g., `full-time`, `real-time`). No spaces around slashes (e.g., `X/Y`). No spaces after opening brackets `(`, `[`, `{` and no spaces before closing brackets `)`, `]`, `}` (e.g., `(text)`). Spaces before/after pipe characters (` | `). Strictly only 1 space between words (no double/triple spaces).
+* **Font Sizes:** Strictly size 10 or 11 for body text (no size 9 or below). Bold text can optionally be 1 size smaller than surrounding text (e.g., bold 9 if body is 10). Bolding must be uniform and selective (2-3 high-signal terms/metrics per bullet). No bold punctuation/brackets.
+* **Dates:** Format: `Apr 2021 - Jul 2021` or `Jan' 2021 - Jul 2021` (space after the first 3 letters of month). Capitalize "Present" as `Present`. Align dates to the extreme right of the page by adding spaces.
+* **Line Fill:** Keep bullets to a single line. Fill at least 70-75% of the line width to avoid a ragged right margin. Split multi-idea bullets.
+* **Grammar & Individuality:** Start bullets with active, non-repetitive power verbs. Focus strictly on individual contributions; speak less/nothing about the organization/society/summit. Follow the STAR model. No spelling/grammar errors.
+* **Content Exceptions:** Do not complain about orphaned skills (skills listed but not in projects). Do not flag basic tech stacks (e.g., HTML/CSS) as low-signal. Do not recommend removing generic tools/IDEs (e.g., VS Code, Figma, Postman).
 
-#### 2. Content Structure & Hierarchy
-The agent must ensure the CV flows in an order optimized for Core technical roles, prioritizing hands-on engineering experience over soft skills.
-* **Section Ordering:** Enforce the following hierarchy: *Education -> Internships / Projects -> Competitions (if any) -> Skills & Expertise -> Coursework Information -> Awards & Achievements -> Extracurricular Activities*. 
-    * Place Internships and Projects immediately after Education to emphasize technical execution.
-    * If a dedicated *Competitions* section is included (for verified hardware, robotics, or technical contests), place it immediately after Projects.
-    * Keep Coursework and Skills positioned logically below Projects/Internships but above Awards and Extracurriculars.
-* **Section Separation:** Do not combine Internships and Projects into a single section if it contains more than 3 items. Separate them into distinct "Internships" and "Projects" sections to avoid a cluttered, disorganized appearance.
-* **Training & Work Experience Rephrasing:** Rephrase generic "Training" or "Work Experience" sections as "Internships" or "Projects" depending on the technical depth and nature of the work.
-* **Positions of Responsibility (POR) Consolidation:** PORs are deemed less important in Core engineering. If the candidate has only one POR, it must be merged into the Extracurriculars section to save space. POR sections must *never* contain raw paragraphs; they must use high-impact, action-oriented bullet points that highlight leadership, scale, and coordination. Exaggerate the tone of POR pointers to make leadership and organizational impact highly visible.
-* **Project Attribution:** Ensure every academic, lab, or research project explicitly lists the guiding Professor's name and department next to or directly under the title (e.g., `Supervisor: Prof. [Name] | [Department] | IIT Kharagpur`).
-* **Coursework Tailoring & Formatting:** 
-    * **Tailoring:** Order listed courses by relevance to the target sub-domain. For Electronics roles, list "Analog/Digital Electronics" and "VLSI" first. For Heavy Electrical roles, list "Electrical Machines" and "Power Systems" first. For Chemical roles, list "Thermodynamics", "Transport Phenomena", and "Reaction Engineering" first.
-    * **Simplification:** Remove basic or irrelevant Computer Science courses (e.g., basic web development) unless applying for a hybrid role. Keep fundamental CS courses like "Programming and Data Structures (PDS)".
-    * **Laboratory Integration:** Do not create a separate "Laboratory Courses" section. Instead, indicate lab components using an asterisk `*` next to the course name and add a clean, unbolded, italicized footnote in parentheses at the bottom RHS of the section: `(* indicates courses with a laboratory component)`. Do not bold this footnote.
-    * **Separator Uniformity:** Maintain strict uniformity in coursework lists. Do not mix separators (e.g., do not use both commas and vertical bars `|` in the same section). Choose one and apply it consistently.
-* **Skills Section Cleanliness:** 
-    * Remove subjective proficiency qualifiers such as "Proficient", "Familiar", "Elementary Proficiency", or grade-based qualifiers (e.g., "Earned a grade of top 2"). Group skills cleanly by category (e.g., Programming Languages, Software/Tools, Core Areas/Skills).
-    * Avoid listing low-level hardware components (e.g., listing individual IC numbers like IC 7474, IC 741, IC 555) as standalone skills; keep the skills section focused on high-level tools, platforms, and methodologies.
-    * Ensure domain-specific tools are highlighted (e.g., Aspen HYSYS, AutoCAD, Inkscape for Chemical; ANSYS, SolidWorks, Fusion 360, MATLAB for Mechanical/Aero; LTspice, Vivado, Cadence, Keil uVision for Electrical/ECE).
-* **Extracurricular Fillers:** If the CV has empty space at the bottom of the page, prompt the user to add Hall-level involvements (e.g., Illumination, Rangoli, General Championships) to fill out the page. Bold key terms like `NSO Athletics` or `GC Choreography`.
+#### 2. Core-Specific Guidelines (10 Points)
+1. **The Anti-Software Filter:** Flag pure web dev or general SDE projects; suggest replacing them with DIY hardware, simulation, or lab projects.
+2. **Simulation Tools:** Elevate core tools (LTspice, SolidWorks, ANSYS, MATLAB, Vivado, Cadence, Aspen HYSYS, Simulink) in the Skills/Tools section.
+3. **Deep Quantification:** Every core project must contain exact physical specs (e.g., clock speeds, nanometer nodes, deflections, stress, FoS, gain, SNR).
+4. **Project Supervisor:** Ensure every academic/research project lists the guiding Professor's name and department (e.g., `Supervisor: Prof. [Name]`).
+5. **Laboratory Integration:** Indicate lab components using an asterisk `*` with a footnote at the bottom: `(* indicates courses with a laboratory component)`.
+6. **Coursework Tailoring:** Ensure core courses listed are relevant to the target sub-domain (e.g., Analog/Digital first for ECE; Thermodynamics first for Chemical).
+7. **Double Decimal Precision:** Flag single-decimal percentages and suggest double-decimal representation (e.g., write `96.50%` instead of `96.5%`).
+8. **No Shorthand Boards:** Ensure high school boards are written out fully (e.g., write "AISSCE (CBSE)" instead of CBSE).
+9. **POR & ECA Consolidation:** PORs are less valued in core; merge single PORs into Extracurriculars to save space. Highlight technical leadership.
+10. **Zero Compensation Mention:** Strictly forbid listing earnings or compensation (e.g., "Earned INR 1500+") from projects or internships.
 
-#### 3. Core-Specific Technical Depth & Quantification
-The agent must aggressively filter out "SDE-style" software resumes and demand hardware, simulation, and physical engineering metrics.
-* **The "Anti-Software" Filter:** Flag pure web-development, basic database management, or SDE projects (e.g., "Full-stack blog app", "AI chatbot", "Tic-Tac-Toe game", "Pen Database Management") and suggest replacing them with DIY hardware, simulation, or lab projects. If a software project is kept, it must have a heavy mathematical, physics, or core engineering focus (e.g., CFD, Physics-Informed Neural Networks, Digital Signal Processing, Finite Element Analysis).
-* **Hardware & Simulation Keywords:** Elevate hardware simulation software to the very top of the Skills/Tools section (e.g., LTspice, SolidWorks, ANSYS, MATLAB, Vivado, Cadence, Aspen HYSYS, HFSS, Simulink).
-* **Deep Quantification:** Do not accept generic descriptions. Every project must contain exact engineering specifications, which must be **bolded**. Demand metrics such as:
-    * *Electronics/VLSI:* Clock speeds, efficiency percentages, Total Harmonic Distortion (THD), gain (dB), phase margin, power dissipation (µW), bandwidth, nanometer nodes (e.g., "**180nm TSMC**"), S-parameters (e.g., "**S11 of -33dB**"), or voltage swing (e.g., "**1Vpp**").
-    * *Mechanical/Chemical/Aero:* Torsional stiffness, weight reductions, temperature drops (in Kelvin/Celsius), heat flux, aerodynamic drag coefficients, flow rates, pressure ratings (e.g., "**1.5x working pressure**"), purity/recovery percentages, compression ratios, or Peak Signal-to-Noise Ratio (PSNR).
-    * *Performance Metrics vs. Initial Parameters:* Do not list static initial parameters as achievements (e.g., "max temp reached was 302K for vol heat flux of 1MW/m3"). Instead, rephrase to show active optimization, performance metrics, or percentage improvements (e.g., "achieved a 45% reduction in peak operating temperature...").
-* **Project Bullet Structure:** Each project must have exactly 3 to 4 highly detailed bullet points.
-    * *The "Aim" Rule:* The first bullet point of every project must clearly state the objective or aim of the project (the "why" and "what") to give the reader immediate context.
-    * *The "Skills Applied" Bullet:* The final bullet point of major projects or internships should explicitly state the key technical skills, tools, or methodologies learned and applied (e.g., "Acquired hands-on experience in LTspice simulation and CMOS layout design...").
-    * *Avoid Trivial Lab Work:* Flag basic, non-ingenious lab experiments (e.g., simple 555 timer connections on a breadboard, basic ADC-DAC interfacing without custom design) and suggest replacing them with projects showing custom design, optimization, or component selection.
-    * *Depth over Breadth:* Avoid listing multiple shallow sub-projects under one header (e.g., listing Class A, B, AB, and push-pull amplifiers in a single project without depth). Focus on one specific implementation and describe it deeply with quantitative specs.
-* **Action Verbs & Tense Consistency:** Flag weak, passive verbs like "Performed", "Completed", "Used", "Worked on", "Participated", "Set up", or present continuous forms like "Designing", "Simulating". Ensure all action verbs are in the past tense and suggest high-impact engineering verbs like "Engineered", "Simulated", "Fabricated", "Synthesized", "Calibrated", "Optimized", "Modelled", "Architected", "Integrated", or "Formulated".
-* **Redundancy & Compensation Filter:** 
-    * Remove subjective, non-quantifiable soft-skill phrases from technical achievements (e.g., "reflecting drive and merit", "showing problem-solving abilities"). Let the numbers and technical metrics speak for themselves.
-    * Remove any mention of monetary earnings, compensation, or funding amounts from tutoring, freelance, or project roles (e.g., flag "Earned INR 1500+" and suggest focusing strictly on the skills acquired, mentorship scale, and technical delivery).
-
-#### 4. Agent Output Strategy
-When the agent generates the review, it must structure its feedback in these four distinct buckets:
-1.  **Margin & Space Audit:** Highlights lines that need to be expanded to fill white space (the 90% rule) or shortened to fit a single line. Identifies timeline alignment issues, bracketed or parenthesized dates, leading white spaces, merged/broken words, and spillover words.
-2.  **Formatting Consistency:** Flags missing zeroes in percentages, incorrect bolding sizes, partial bolding, bolded metadata, non-standard section headers, inconsistent coursework separators, missing or non-standard bullet points, and raw URLs.
-3.  **Technical Specification Enhancements:** Points out specific hardware or simulation projects that lack engineering metrics, static initial parameters instead of performance metrics, weak action verbs, or trivial descriptions, providing concrete examples of what to add (e.g., "Your Op-Amp project is missing the Voltage Gain and Output Swing numbers. Add them and bold the metrics.").
-4.  **Domain Relevance Check:** Warns the user if their CV reads too much like a software engineer's profile, checks the ordering of sections and coursework, and ensures proper project attribution to guiding professors.
+#### 3. Agent Output Structure
+1. **Margin & Space Audit:** Whitespace checks, date alignments, bracketed date syntax, and word spillover corrections.
+2. **Formatting Consistency:** Bolding size discrepancies, board naming, non-standard headings, missing course separators.
+3. **Technical Specification Enhancements:** Missing engineering or simulation metrics in projects/internships.
+4. **ERP Submission Reminders:** Always append a brief reminder to the user to use Firefox for final edits, keep HTML backups using SingleFile, install Dynac KGP ERP, and never edit before the portal fully loads to avoid text distortion.

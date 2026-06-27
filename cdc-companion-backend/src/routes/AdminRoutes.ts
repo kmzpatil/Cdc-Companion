@@ -71,4 +71,11 @@ router.post(
   }
 )
 
+router.post(
+  '/remind',
+  (req: Request, res: Response, next: NextFunction) => {
+    ctrl.sendReminder(req, res, next).catch(next)
+  }
+)
+
 export default router

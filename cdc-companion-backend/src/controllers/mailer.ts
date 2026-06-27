@@ -41,3 +41,37 @@ export async function sendRegistrationEmail(to: string, userName: string, passwo
     throw new Error(`Failed to send registration email: ${await res.text()}`);
   }
 }
+
+export async function sendReviewerRegistrationEmail(to: string, userName: string, password: string, profiles: string[]): Promise<void> {
+  const res = await fetch(`${getFrontendUrl()}/api/mailer`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getSecret()}`
+    },
+    body: JSON.stringify({
+      action: 'REVIEWER_REGISTRATION',
+      payload: { to, userName, password, profiles }
+    })
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to send reviewer registration email: ${await res.text()}`);
+  }
+}
+
+export async function sendReviewerReminderEmail(to: string, userName: string, password: string, pendingCount: number): Promise<void> {
+  const res = await fetch(`${getFrontendUrl()}/api/mailer`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getSecret()}`
+    },
+    body: JSON.stringify({
+      action: 'REVIEWER_REMINDER',
+      payload: { to, userName, password, pendingCount }
+    })
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to send reviewer reminder email: ${await res.text()}`);
+  }
+}

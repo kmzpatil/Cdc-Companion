@@ -193,10 +193,12 @@ function ReviewersTable({
   reviewers,
   onReassign,
   onDelete,
+  onRemind,
 }: {
   reviewers: Reviewer[]
   onReassign: (revieweeId: number, reviewerId: number | null) => void
   onDelete: (id: number) => void
+  onRemind: (id: number) => void
 }) {
   const [sortState, setSortState] = useState<SortState>({ column: null, direction: null })
 
@@ -304,7 +306,16 @@ function ReviewersTable({
                     <span className="text-xs text-muted">None</span>
                   )}
                 </td>
-                <td>
+                <td className="space-x-2">
+                  {reviewer.assignedCVs.some(cv => !cv.status) && (
+                    <button
+                      type="button"
+                      onClick={() => onRemind(reviewer.id)}
+                      className="text-xs font-bold text-purple-600 hover:text-purple-800 hover:underline transition-colors"
+                    >
+                      Remind
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => onDelete(reviewer.id)}
@@ -548,6 +559,41 @@ export default function AdminDashboardPage() {
     }
   }
 
+  const handleRemind = async (reviewerId: number) => {
+    try {
+      const res = await authFetch(`${BACKEND_URL}/api/admin/remind`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviewerId }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to send reminder email')
+      }
+      const data = await res.json()
+      alert(data.message || 'Reminder sent!')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Reminder failed')
+    }
+  }
+
+  const handleRemindAll = async () => {
+    if (!confirm('Are you sure you want to send reminder emails to all reviewers with pending CV reviews?')) return
+    try {
+      const res = await authFetch(`${BACKEND_URL}/api/admin/remind`, {
+        method: 'POST',
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to send reminder emails')
+      }
+      const data = await res.json()
+      alert(data.message || 'Reminders sent!')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Reminders failed')
+    }
+  }
+
   if (loading) {
     return (
       <section className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-4 py-10">
@@ -568,6 +614,9 @@ export default function AdminDashboardPage() {
           <button type="button" onClick={handleAllocate} className="pill-btn pill-btn-primary" disabled={allocating}>
             {allocating ? 'Allocating...' : 'Run Allocation'}
           </button>
+          <button type="button" onClick={handleRemindAll} className="pill-btn pill-btn-primary bg-indigo-600 hover:bg-indigo-700 text-white">
+            Remind All
+          </button>
           <button type="button" onClick={handleLogout} className="pill-btn pill-btn-secondary">
             Logout
           </button>
@@ -582,7 +631,7 @@ export default function AdminDashboardPage() {
         <RevieweesTable reviewees={reviewees} reviewers={reviewers} onReassign={handleReassign} onDelete={handleDeleteReviewee} />
       </div>
       <div className="animate-slide-up">
-        <ReviewersTable reviewers={reviewers} onReassign={handleReassign} onDelete={handleDeleteReviewer} />
+        <ReviewersTable reviewers={reviewers} onReassign={handleReassign} onDelete={handleDeleteReviewer} onRemind={handleRemind} />
       </div>
       <div className="animate-slide-up">
         <ReviewsTable reviews={reviews} onDelete={handleDeleteReview} />

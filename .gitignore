@@ -2,5 +2,4 @@
 */.env
 cv_skills/exports/
 cv_skills/extracted_cvs/*.txt
-
-
+exports/

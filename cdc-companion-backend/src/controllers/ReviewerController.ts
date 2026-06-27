@@ -3,7 +3,7 @@
   import jwt from 'jsonwebtoken'
   import axios from 'axios'
   import pdfParse from 'pdf-parse'
-  import { sendReviewEmail } from './mailer'
+  import { sendReviewEmail, sendReviewerRegistrationEmail } from './mailer'
   import prisma from '../prisma'
   import path from 'path'
   import fs from 'fs'
@@ -118,6 +118,11 @@
             reviewedCount: 0,
             interestedInMockInterview: Boolean(interestedInMockInterview)
           }
+        })
+
+        // Send registration confirmation email containing their details and password asynchronously
+        sendReviewerRegistrationEmail(email, name, rollNo, profiles).catch((mailErr) => {
+          console.error("Failsafe: Error sending reviewer registration email:", mailErr)
         })
 
         return res.status(201).json({

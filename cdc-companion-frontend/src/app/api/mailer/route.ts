@@ -442,6 +442,219 @@ async function sendRegistrationEmail(to: string, userName: string, password: str
   })
 }
 
+async function sendReviewerRegistrationEmail(to: string, userName: string, password: string, profiles: string[]): Promise<void> {
+  const html = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewer Registration Confirmed - CDC Companion</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f6f6ef;
+        padding: 20px;
+      }
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #d6d2c1;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      }
+      h2 {
+        color: #7c3aed;
+        margin-top: 0;
+      }
+      .details-table {
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+      }
+      .details-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #efece0;
+      }
+      .details-table td.label {
+        font-weight: 700;
+        color: #5a5f66;
+        width: 35%;
+      }
+      .details-table td.val {
+        color: #1b2126;
+      }
+      .password-box {
+        font-size: 18px;
+        font-weight: 700;
+        color: #7c3aed;
+        background-color: #fefcf8;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #d6d2c1;
+        display: inline-block;
+      }
+      .footer {
+        margin-top: 25px;
+        border-top: 1px solid #d6d2c1;
+        padding-top: 15px;
+        font-size: 12px;
+        color: #5a5f66;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🎉 Reviewer Registration Successful!</h2>
+      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Thank you for registering as a CV reviewer with the CDC Companion portal. We have successfully registered your account. Below are your login credentials and details:</p>
+      
+      <table class="details-table">
+        <tr>
+          <td class="label">Assigned Profiles</td>
+          <td class="val">${profiles.join(', ')}</td>
+        </tr>
+        <tr>
+          <td class="label">Login Email</td>
+          <td class="val">${to}</td>
+        </tr>
+        <tr>
+          <td class="label">Portal Password</td>
+          <td class="val"><span class="password-box">${password}</span></td>
+        </tr>
+      </table>
+
+      <p style="font-size: 13px; color: #5a5f66; background-color: #f5f3ff; padding: 12px; border-radius: 8px; border-left: 4px solid #7c3aed;">
+        ⚠️ <strong>Important</strong>: Please keep this email safe. Your portal password is your Roll Number (shown above). You will need this email address and password to log in and review candidates' CVs!
+      </p>
+
+      <div class="footer">
+        <p>Communiqué • IIT Kharagpur Placement & Internship Preparation Companion</p>
+      </div>
+    </div>
+  </body>
+  </html>
+  `
+
+  await transporter.sendMail({
+    from: `"Communiqué, IIT Kharagpur" <${process.env.SMTP_USER}>`,
+    to,
+    subject: '🎉 Reviewer Registration Confirmed - CDC Companion',
+    html,
+  })
+}
+
+async function sendReviewerReminderEmail(to: string, userName: string, password: string, pendingCount: number): Promise<void> {
+  const html = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending CV Reviews Reminder - CDC Companion</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f6f6ef;
+        padding: 20px;
+      }
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #d6d2c1;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      }
+      h2 {
+        color: #7c3aed;
+        margin-top: 0;
+      }
+      .details-table {
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+      }
+      .details-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #efece0;
+      }
+      .details-table td.label {
+        font-weight: 700;
+        color: #5a5f66;
+        width: 35%;
+      }
+      .details-table td.val {
+        color: #1b2126;
+      }
+      .password-box {
+        font-size: 16px;
+        font-weight: 700;
+        color: #7c3aed;
+        background-color: #fefcf8;
+        padding: 6px 10px;
+        border-radius: 4px;
+        border: 1px solid #d6d2c1;
+        display: inline-block;
+      }
+      .footer {
+        margin-top: 25px;
+        border-top: 1px solid #d6d2c1;
+        padding-top: 15px;
+        font-size: 12px;
+        color: #5a5f66;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>⏳ Pending CV Reviews Reminder</h2>
+      <p>Hello <strong>${userName}</strong>,</p>
+      <p>This is a quick reminder that you have <strong>${pendingCount}</strong> pending CV review(s) assigned to you on the CDC Companion portal.</p>
+      <p>Please log in to the portal using your credentials to complete the reviews:</p>
+      
+      <table class="details-table">
+        <tr>
+          <td class="label">Login Email</td>
+          <td class="val">${to}</td>
+        </tr>
+        <tr>
+          <td class="label">Password</td>
+          <td class="val"><span class="password-box">${password}</span></td>
+        </tr>
+      </table>
+
+      <p style="font-size: 13px; color: #5a5f66; background-color: #f5f3ff; padding: 12px; border-radius: 8px; border-left: 4px solid #7c3aed;">
+        💡 <strong>Action Required</strong>: Please review the CVs at your earliest convenience to help students prepare for placements and internships.
+      </p>
+
+      <div class="footer">
+        <p>Communiqué • IIT Kharagpur Placement & Internship Preparation Companion</p>
+      </div>
+    </div>
+  </body>
+  </html>
+  `
+
+  await transporter.sendMail({
+    from: `"Communiqué, IIT Kharagpur" <${process.env.SMTP_USER}>`,
+    to,
+    subject: '⏳ Pending CV Reviews Reminder - CDC Companion',
+    html,
+  })
+}
+
+
+
 function parseMarkdownToHtml(markdown: string): string {
   if (!markdown) return '';
   
@@ -550,6 +763,14 @@ export async function POST(req: NextRequest) {
     } else if (action === 'REGISTRATION') {
       const { to, userName, password, cvLink, profile } = payload;
       await sendRegistrationEmail(to, userName, password, cvLink, profile);
+      return NextResponse.json({ success: true });
+    } else if (action === 'REVIEWER_REGISTRATION') {
+      const { to, userName, password, profiles } = payload;
+      await sendReviewerRegistrationEmail(to, userName, password, profiles);
+      return NextResponse.json({ success: true });
+    } else if (action === 'REVIEWER_REMINDER') {
+      const { to, userName, password, pendingCount } = payload;
+      await sendReviewerReminderEmail(to, userName, password, pendingCount);
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
