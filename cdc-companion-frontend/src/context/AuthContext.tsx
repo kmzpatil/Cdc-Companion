@@ -50,15 +50,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // wrapper around fetch to inject Bearer
-  const authFetch: typeof fetch = (input, init = {}) => {
+  const authFetch: typeof fetch = async (input, init = {}) => {
     const activeToken = token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null)
-    return fetch(input, {
+    const response = await fetch(input, {
       ...init,
       headers: {
         ...(init.headers || {}),
         Authorization: activeToken ? `Bearer ${activeToken}` : '',
       },
     })
+
+    if (response.status === 401 || response.status === 403) {
+      logout()
+      if (typeof window !== 'undefined') {
+        const isAdmin = window.location.pathname.startsWith('/admin')
+        window.location.href = isAdmin ? '/login/admin' : '/login/reviewer'
+      }
+    }
+
+    return response
   }
 
   // attempt login
@@ -90,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null)
     setUser(null)
     localStorage.removeItem('auth')
+    localStorage.removeItem('token')
   }
 
   const value: AuthContextType = {

@@ -41,7 +41,7 @@ const FEEDBACK_FIELDS = [
 
 export default function ReviewerDashboardPage() {
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout, authFetch } = useAuth()
 
   const [loadingNext, setLoadingNext] = useState(false)
   const [loadingAssigned, setLoadingAssigned] = useState(false)
@@ -66,9 +66,7 @@ export default function ReviewerDashboardPage() {
     setLoadingAssigned(true)
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/reviewer/assigned`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      })
+      const res = await authFetch(`${BACKEND_URL}/api/reviewer/assigned`)
 
       if (!res.ok) throw new Error('Failed to fetch assigned CVs')
 
@@ -87,9 +85,7 @@ export default function ReviewerDashboardPage() {
     setLoadingNext(true)
 
     try {
-      const nextRes = await fetch(`${BACKEND_URL}/api/reviewer/next`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      })
+      const nextRes = await authFetch(`${BACKEND_URL}/api/reviewer/next`)
 
       if (!nextRes.ok && nextRes.status !== 204) {
         throw new Error('Failed to fetch next CV')
@@ -133,11 +129,10 @@ export default function ReviewerDashboardPage() {
     }
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/reviewer/review`, {
+      const res = await authFetch(`${BACKEND_URL}/api/reviewer/review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           revieweeId: selectedAssigned.id,
