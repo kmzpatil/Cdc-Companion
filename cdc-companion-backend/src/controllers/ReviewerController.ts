@@ -486,7 +486,7 @@
 
             // Offline fallback suggestions if Groq keys fail
             if (!aiSuggestions) {
-              aiSuggestions = `### AI CV Refinement Suggestions (Offline Fallback)\nThe AI assistant is temporarily busy or reached its request limit. Here is a summary of recommended actions based on the reviewer's feedback:\n* **Address Reviewer Comments**: Focus on the specific items highlighted by the reviewer (e.g., improve structure, add domain-specific terminology).\n* **Quantify Results**: Try to add metrics (percentages, numbers) to your project descriptions and work experience bullet points.\n* **Format Consistency**: Ensure consistent margins, font sizes, and bullet styles throughout the document.`
+              aiSuggestions = `### Some extra suggestions (Offline Fallback)\nThe AI assistant is temporarily busy or reached its request limit. Here is a summary of recommended actions based on the reviewer's feedback:\n* **Address Reviewer Comments**: Focus on the specific items highlighted by the reviewer (e.g., improve structure, add domain-specific terminology).\n* **Quantify Results**: Try to add metrics (percentages, numbers) to your project descriptions and work experience bullet points.\n* **Format Consistency**: Ensure consistent margins, font sizes, and bullet styles throughout the document.`
             }
 
             // Update the review with the AI Suggestions

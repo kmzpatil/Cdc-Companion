@@ -288,7 +288,7 @@ function buildReviewEmail(opts: ReviewEmailOptions): string {
       <!-- AI Recommendations Section -->
       <div class="review-section" style="border-left-color: #10b981; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);">
         <div class="review-title" style="color: #047857; font-weight: 700;">
-          ✨ AI CV Refinement Suggestions
+          ✨ Some extra suggestions
         </div>
         <div style="font-size: 14px; line-height: 1.6; color: #1f2937; background: white; padding: 16px; border-radius: 8px; border-left: 3px solid #10b981; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); font-family: sans-serif;">
           ${parseMarkdownToHtml(aiSuggestions)}
