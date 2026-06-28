@@ -111,6 +111,7 @@ async allocate(req: Request, res: Response, next: NextFunction) {
       .map(cv => ({
         ...cv,
         rollPrefix: parseInt(cv.rollNo.slice(0, 2), 10),
+        department: cv.rollNo.slice(2, 4).toUpperCase(),
         normProfile: normalizeProfile(cv.profile) // cache this to save CPU
       }))
       .sort((a, b) => a.rollPrefix - b.rollPrefix); 
@@ -123,6 +124,7 @@ async allocate(req: Request, res: Response, next: NextFunction) {
     const reviewers = rawReviewers.map(r => ({
       ...r,
       pwdPrefix: parseInt(r.password.slice(0, 2), 10),
+      department: r.password.slice(2, 4).toUpperCase(),
       normProfiles: r.profiles.map(normalizeProfile)
     }));
 
@@ -136,12 +138,20 @@ async allocate(req: Request, res: Response, next: NextFunction) {
           );
         })
         .sort((a, b) => {
-          // Primary Sort: Load balancing (whoever has fewer assigned CVs)
+          // Primary Sort: Same department preference for Core profile
+          if (cv.normProfile === 'core') {
+            const aSameDept = a.department === cv.department;
+            const bSameDept = b.department === cv.department;
+            if (aSameDept && !bSameDept) return -1;
+            if (!aSameDept && bSameDept) return 1;
+          }
+
+          // Secondary Sort: Load balancing (whoever has fewer assigned CVs)
           if (a.assignedCVs.length !== b.assignedCVs.length) {
             return a.assignedCVs.length - b.assignedCVs.length;
           }
           
-          // Secondary Sort: Conserve your super-seniors!
+          // Tertiary Sort: Conserve your super-seniors!
           // If a 23-batch and a 22-batch reviewer have the exact same workload, 
           // we want the 23-batch reviewer to take it (higher prefix number = less senior).
           return b.pwdPrefix - a.pwdPrefix; 
