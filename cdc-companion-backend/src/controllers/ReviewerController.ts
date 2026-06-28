@@ -402,7 +402,7 @@
                 const currentIdx = (state.geminiIndex + i) % geminiKeys.length
                 const currentKey = geminiKeys[currentIdx]
                 try {
-                  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${currentKey}`
+                  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${currentKey}`
                   const geminiResponse = await fetch(geminiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
