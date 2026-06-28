@@ -121,12 +121,23 @@ async allocate(req: Request, res: Response, next: NextFunction) {
     });
 
     // Pre-compute reviewer prefixes and profiles to avoid doing it inside the loop
-    const reviewers = rawReviewers.map(r => ({
-      ...r,
-      pwdPrefix: parseInt(r.password.slice(0, 2), 10),
-      department: r.password.slice(2, 4).toUpperCase(),
-      normProfiles: r.profiles.map(normalizeProfile)
-    }));
+    const reviewers = rawReviewers.map(r => {
+      let parsedPrefix = parseInt(r.password.slice(0, 2), 10);
+      let department = r.password.slice(2, 4).toUpperCase();
+      
+      // Fallback for reviewers whose passwords aren't roll numbers (e.g. email prefixes)
+      if (isNaN(parsedPrefix)) {
+        parsedPrefix = 23; // Default to 3rd year seniority so they can review 2nd year (24) CVs
+        department = 'XX'; // Unknown department fallback
+      }
+
+      return {
+        ...r,
+        pwdPrefix: parsedPrefix,
+        department,
+        normProfiles: r.profiles.map(normalizeProfile)
+      };
+    });
 
     for (const cv of pendingOptimized) {
       const eligible = reviewers
