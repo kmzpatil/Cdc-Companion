@@ -254,7 +254,7 @@ export default function RevieweeDashboardPage() {
             <div className="paper-card animate-slide-up p-6 md:p-8 space-y-6 h-fit">
               <div className="border-b border-border pb-4 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-black text-[#1b2126]">Detailed Feedback</h2>
+                  <h2 className="text-2xl font-black text-[#1b2126]">Detailed Feedback [Senior suggested changes]</h2>
                   <p className="mt-1 text-xs text-[#4f5964]">
                     Diagnostic evaluation of your CV by senior reviewers.
                   </p>
@@ -280,7 +280,7 @@ export default function RevieweeDashboardPage() {
               {showCV && feedback.aiSuggestions && (
                 <div className="animate-scale-in rounded-xl border border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/10 p-5 mt-6 space-y-3">
                   <h3 className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                    ✨ Some extra suggestions
+                    ✨ Some extra suggestions [AI suggested changes]
                   </h3>
                   <div 
                     className="text-sm leading-relaxed text-[#1b2126] font-medium bg-white dark:bg-slate-900 p-4 rounded-lg border border-border"
@@ -309,7 +309,7 @@ export default function RevieweeDashboardPage() {
           <section className="lg:col-span-7 space-y-6">
             <div className="paper-card animate-slide-up p-6 md:p-8 space-y-3 border border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/10 h-fit">
               <h3 className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                ✨ Some extra suggestions
+                ✨ Some extra suggestions [AI suggested changes]
               </h3>
               <div 
                 className="text-sm leading-relaxed text-[#1b2126] font-medium bg-white dark:bg-slate-900 p-4 rounded-lg border border-border"
