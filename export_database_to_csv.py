@@ -72,36 +72,21 @@ def fetch_rows(conn, query, fieldnames):
 def export_all(conn, output_dir):
     os.makedirs(output_dir, exist_ok=True)
 
-    reviewee_fields = [
-        'id', 'name', 'rollNo', 'email', 'cvLink',
-        'profile', 'status', 'submittedAt', 'assignedToId',
-    ]
-    reviewee_query = 'SELECT "id", "name", "rollNo", "email", "cvLink", "profile", "status", "submittedAt", "assignedToId" FROM "Reviewee" ORDER BY "id"'
-    reviewees = fetch_rows(conn, reviewee_query, reviewee_fields)
-    write_csv(os.path.join(output_dir, 'reviewees.csv'), reviewee_fields, reviewees)
-
-    reviewer_fields = [
-        'id', 'name', 'password', 'profiles', 'reviewsNumber',
-        'reviewedCount', 'email', 'admin',
-    ]
-    reviewer_query = 'SELECT "id", "name", "password", "profiles", "reviewsNumber", "reviewedCount", "email", "admin" FROM "Reviewer" ORDER BY "id"'
-    reviewers = fetch_rows(conn, reviewer_query, reviewer_fields)
-    write_csv(os.path.join(output_dir, 'reviewers.csv'), reviewer_fields, reviewers)
-
-    review_fields = [
-        'id', 'comments', 'createdAt',
-        'revieweeId', 'reviewerId',
-    ]
-    review_query = 'SELECT "id", "comments", "createdAt", "revieweeId", "reviewerId" FROM "Review" ORDER BY "id"'
-    reviews = fetch_rows(conn, review_query, review_fields)
-    write_csv(os.path.join(output_dir, 'reviews.csv'), review_fields, reviews)
-
-    admin_fields = [
-        'id', 'name', 'password',
-    ]
-    admin_query = 'SELECT "id", "name", "password" FROM "Admin" ORDER BY "id"'
-    admins = fetch_rows(conn, admin_query, admin_fields)
-    write_csv(os.path.join(output_dir, 'admins.csv'), admin_fields, admins)
+    tables = ["Reviewee", "Reviewer", "Review", "Admin"]
+    for table in tables:
+        query = f'SELECT * FROM "{table}" ORDER BY "id"'
+        if _PSYCOPG_VERSION == 'psycopg':
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(query)
+                rows = cur.fetchall()
+                fieldnames = [desc.name for desc in cur.description]
+        else:
+            import psycopg2.extras
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(query)
+                rows = cur.fetchall()
+                fieldnames = [desc.name for desc in cur.description]
+        write_csv(os.path.join(output_dir, f'{table.lower()}s.csv'), fieldnames, rows)
 
     print(f'Export complete. CSV files written to: {output_dir}')
 

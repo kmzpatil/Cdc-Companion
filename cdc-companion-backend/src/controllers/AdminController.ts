@@ -283,7 +283,7 @@ async allocate(req: Request, res: Response, next: NextFunction) {
   // POST /api/admin/remind
   async sendReminder(req: Request, res: Response, next: NextFunction) {
     try {
-      const { reviewerId } = req.body
+      const { reviewerId } = req.body || {}
 
       if (reviewerId) {
         // Remind a single reviewer

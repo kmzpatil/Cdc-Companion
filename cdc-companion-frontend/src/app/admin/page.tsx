@@ -582,6 +582,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await authFetch(`${BACKEND_URL}/api/admin/remind`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
       })
       if (!res.ok) {
         const err = await res.json()
