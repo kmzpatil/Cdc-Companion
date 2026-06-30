@@ -17,7 +17,7 @@ const PROFILES = [
 ]
 
 const EMAIL_REGEX = /^[^@]+@kgpian\.iitkgp\.ac\.in$/
-const ROLL_REGEX = /^(?:23[A-Za-z]{2}3.*|24[A-Za-z]{2}1.*)$/
+const ROLL_REGEX = /^(?:23[A-Za-z]{2}.*|24[A-Za-z]{2}.*)$/
 
 interface FormData {
   fullName: string
@@ -71,7 +71,7 @@ export default function RegisterPage() {
     }
 
     if (!ROLL_REGEX.test(rollNo.trim())) {
-      setError('Roll must start with 23XX3 or 24XX1, where XX are letters.')
+      setError('Roll must start with 23XX or 24XX, where XX are letters.')
       return false
     }
 

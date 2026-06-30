@@ -52,8 +52,8 @@ export default function ReviewerSignupPage() {
       return false
     }
 
-    // Roll Number validation: must be 23XX1... (2023 batch) or 22XX3... (2022 batch)
-    const reviewerRollRegex = /^(?:23[A-Za-z]{2}1|22[A-Za-z]{2}3)/
+    // Roll Number validation: must be 23... (2023 batch) or 22... (2022 batch)
+    const reviewerRollRegex = /^(?:23[A-Za-z]{2}|22[A-Za-z]{2})/
     if (!reviewerRollRegex.test(rollNo.trim())) {
       setError('Please recheck your Roll Number.')
       return false
