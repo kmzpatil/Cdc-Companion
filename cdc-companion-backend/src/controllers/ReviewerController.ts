@@ -113,6 +113,7 @@
             name,
             password: rollNo,
             email,
+            contactNumber,
             profiles,
             reviewsNumber: Number(reviewsNumber),
             reviewedCount: 0,

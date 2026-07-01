@@ -47,6 +47,7 @@ model Reviewer {
   email         String     @unique
   admin         Boolean    @default(false)
   interestedInMockInterview Boolean @default(false)
+  contactNumber String?
 
   assignedCVs   Reviewee[] 
   reviewsGiven  Review[]   @relation("ReviewerToReview")
